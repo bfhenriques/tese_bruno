@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Dashboard</title>
+    <meta charset="utf-8"/>
+    {% load static %}
+    <script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'interface/js/feather.min.js' %}"></script>
+    <script src="{% static 'interface/js/bootstrap.bundle.js' %}"></script>
+    <script src="{% static 'interface/js/bootstrap.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'interface/css/bootstrap.min.css' %}" type="text/css"/>
+    <link href="{% static 'interface/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'interface/css/dashboard.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'interface/css/bootstrap-theme.min.css' %}"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body class="body">
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'index' %}">Dashboard</a>
+    <div class="dropdown" style="padding-right: 5px; color: #ffffff">
+        Welcome {{ user.username }}
+        <button class="btn btn-secondary btn-sm dropdown-toggle" id="dropdownMenuButton"
+                data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false"><i class="fa fa-cogs"></i>
+            Settings
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+            {% if permission.pk != 1 %}
+                <a class="dropdown-item" href="{% url 'edit_user' 0 %}"><i class="fa fa-user"></i> Profile</a>
+            {% endif %}
+            <a class="dropdown-divider"></a>
+            <a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out"></i> Log out</a>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">
+                            Dashboard
+                        </a>
+                    </li>
+                    {% if permission.contents %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'view_contents' %}">
+                                <svg data-feather="file"></svg>
+                                Contents
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if permission.timelines %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'view_timelines' %}">
+                                <svg data-feather="film"></svg>
+                                Timelines
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if permission.views %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'view_views' %}">
+                                <svg data-feather="monitor"></svg>
+                                Views
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if permission.pk == 1 %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'view_users' %}">
+                                <svg data-feather="users"></svg>
+                                Users
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+
+    </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+
+<script>
+    feather.replace()
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+{% extends "interface/header.html" %}
+
+{% block content %}
+    {% load static %}
+    <link href="{% static 'interface/css/view.css' %}" rel="stylesheet">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">Timelines</h1>
+            <a class="btn btn-outline-secondary my-2 my-sm-0" href="{% url 'add_timeline' %}">Add timeline</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-condensed" style="border-collapse: collapse;"
+                   id="timelines">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Duration</th>
+                    <th>Author</th>
+                    <th>Creation date</th>
+                    <th>Last modified</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for timeline in timelines_list %}
+                    <tr class="accordion-toggle" data-toggle="collapse" data-target="#data{{ timeline.pk }}">
+                        <td>{{ timeline.name }}</td>
+                        <td>{{ timeline.duration }} s</td>
+                        <td>{{ timeline.creator }}</td>
+                        <td>{{ timeline.creation_date }}</td>
+                        <td>{{ timeline.last_modified }}</td>
+                        {% if permission.pk == 1 %}
+                            <td><a href="{% url 'permissions_timelines' pk=timeline.pk %}">
+                                <svg data-feather="lock"></svg>
+                            </a></td>
+                        {% endif %}
+                        <td><a href="{% url 'edit_timeline' pk=timeline.pk %}">
+                            <svg data-feather="edit-3"></svg>
+                        </a></td>
+                        <td><a href="{% url 'delete_timeline' pk=timeline.pk %}">
+                            <svg data-feather="trash-2"></svg>
+                        </a></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" class="hiddenRow">
+                            <div class="accordion-body collapse" id="data{{ timeline.pk }}">
+                                <table class="table table-sm">
+                                    <tbody>
+                                    {% for content in timeline.contents %}
+                                        <tr>
+                                            <td></td>
+                                            <td>{{ content.name }}</td>
+                                            <td>{{ content.duration }} s</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+{% endblock %}

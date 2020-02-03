@@ -1,0 +1,15 @@
+
+A) Instructions of configuration computer
+    1 - Install Raspbian in microSD
+        - install etcher
+        - flash microSD card with raspbian image using etcher
+
+    2 - run config1.sh
+
+B) Instructions of RPI
+
+    3 - eject and plug microSD card into RPI
+
+    4 - open a terminal
+        - cd dmmd/raspberry
+        - sudo ./config2.sh (there is a bug upgrading to 10.0.1 version of pip. If the error occurs, run the script again)

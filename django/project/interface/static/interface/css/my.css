@@ -1,0 +1,22 @@
+.ui-sortable tr {
+    cursor:pointer;
+}
+.ui-sortable tr:hover {
+    background:rgba(244,251,17,0.45);
+}
+
+body
+{
+    counter-reset: Serial;
+}
+
+table
+{
+    border-collapse: separate;
+}
+
+tr td:first-child:before
+{
+  counter-increment: Serial;
+  content: counter(Serial);
+}

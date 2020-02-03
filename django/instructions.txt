@@ -1,0 +1,8 @@
+Server requirements:
+    1) Install poppler to process PDF's: https://gist.github.com/Dayjo/618794d4ff37bb82ddfb02c63b450a81
+
+Run server:
+
+    1) tmux new -s dashboard
+    2) sudo python3 manage.py runserver 0.0.0.0:80
+    3) press 'CTRL+b' and then press 'd'

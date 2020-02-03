@@ -1,0 +1,151 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    contents = models.BooleanField()
+    timelines = models.BooleanField()
+    views = models.BooleanField()
+
+    def as_dict(self):
+        return {
+            "pk": self.user.pk,
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "username": self.user.username,
+            "email": self.user.email,
+            "contents": self.contents,
+            "timelines": self.timelines,
+            "views": self.views
+        }
+
+
+class Content(models.Model):
+    name = models.CharField(max_length=140)
+    creation_date = models.DateTimeField()
+    last_modified = models.DateTimeField()
+    path = models.CharField(max_length=140, null=True)
+    file_type = models.CharField(max_length=5, null=True)
+    video_duration = models.PositiveIntegerField(null=True)
+    permissions = models.ManyToManyField(UserProfile)
+    has_changed = models.BooleanField()
+
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def as_dict(self):
+        return {
+            "pk": self.pk,
+            "name": self.name,
+            "creation_date": self.creation_date.strftime('%c'),
+            "last_modified": self.last_modified.strftime('%c'),
+            "path": self.path,
+            "file_type": self.file_type,
+            "duration": 0 if self.file_type == 'image' else self.video_duration,
+            "creator": "None" if self.creator is None else self.creator.username,
+            "permissions": [user.as_dict() for user in self.permissions.all()]
+        }
+
+class Timeline(models.Model):
+    name = models.CharField(max_length=140)
+    creation_date = models.DateTimeField()
+    last_modified = models.DateTimeField()
+    permissions = models.ManyToManyField(UserProfile)
+    has_changed = models.BooleanField()
+    duration = models.PositiveIntegerField()
+
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def as_dict(self):
+        contents = []
+        for content in TimelineContents.objects.filter(timeline_id=self.pk).order_by('orderindex'):
+            aux_content = Content.objects.get(pk=content.content.pk).as_dict()
+            aux_content['duration'] = content.duration
+            contents.append(aux_content)
+        return {
+            "pk": self.pk,
+            "name": self.name,
+            "creation_date": self.creation_date.strftime('%c'),
+            "last_modified": self.last_modified.strftime('%c'),
+            "duration": self.duration,
+            "contents": contents,
+            "creator": "None" if self.creator is None else self.creator.username,
+            "permissions": [user.as_dict() for user in self.permissions.all()]
+        }
+
+class View(models.Model):
+    name = models.CharField(max_length=140)
+    resolution = models.CharField(max_length=15)
+    mac = models.CharField(max_length=20, unique=True)
+    creation_date = models.DateTimeField()
+    last_modified = models.DateTimeField()
+    configured = models.BooleanField()
+    permissions = models.ManyToManyField(UserProfile)
+    has_changed = models.BooleanField()
+
+    def __str__(self):
+        return self.name
+
+    def as_dict(self):
+        duration = 0
+        timelines = []
+        for timeline in ViewTimelines.objects.filter(view_id=self.pk).order_by('orderindex'):
+            aux_timeline = timeline.timeline.as_dict()
+            aux_timeline['orderindex'] = timeline.orderindex
+            timelines.append(aux_timeline)
+            duration += aux_timeline['duration']
+
+        return {
+            "pk": self.pk,
+            "name": self.name,
+            "creation_date": self.creation_date.strftime('%c'),
+            "last_modified": self.last_modified.strftime('%c'),
+            "resolution": self.resolution,
+            "mac": self.mac,
+            "configured": self.configured,
+            "duration": duration,
+            "timelines": timelines,
+            "permissions": [user.as_dict() for user in self.permissions.all()]
+        }
+
+
+class TimelineContents(models.Model):
+    timeline = models.ForeignKey(Timeline, on_delete=models.CASCADE)
+    content = models.ForeignKey(Content, on_delete=models.CASCADE)
+    orderindex = models.PositiveIntegerField()
+    duration = models.PositiveIntegerField()
+
+    def __str__(self):
+        return " ".join([self.content.__str__(), self.timeline.__str__(), str(self.orderindex), str(self.duration)])
+
+    def as_dict(self):
+        return {
+            "pk": self.pk,
+            "timeline": self.timeline,
+            "content": self.content,
+            "orderindex": self.orderindex,
+            "duration": self.duration,
+        }
+
+
+class ViewTimelines(models.Model):
+    view = models.ForeignKey(View, on_delete=models.CASCADE)
+    timeline = models.ForeignKey(Timeline, on_delete=models.CASCADE)
+    orderindex = models.PositiveIntegerField()
+
+    def __str__(self):
+        return " ".join([self.timeline.__str__(), self.view.__str__(), str(self.orderindex)])
+
+    def as_dict(self):
+        return {
+            "pk": self.pk,
+            "view": self.view,
+            "timeline": self.timeline,
+            "orderindex": self.orderindex,
+        }

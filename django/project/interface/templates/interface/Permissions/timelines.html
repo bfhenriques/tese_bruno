@@ -1,0 +1,44 @@
+{% extends "interface/header.html" %}
+
+{% block content %}
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">Timeline permissions</h1>
+        </div>
+        <h4>{{ timeline.name }}</h4>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Timeline permission</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users_list %}
+                        <tr>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <label class="form-check-label" for="user">
+                                    <input class="form-control" type="checkbox" id="user{{ user.pk }}" name="permissions" value="{{ user.pk }}">
+                                </label>
+                                <script>
+                                    $('#user{{ user.pk }}').prop("checked", "{{ user.permission }}" === "True");
+                                </script>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+
+    </main>
+
+{% endblock %}
