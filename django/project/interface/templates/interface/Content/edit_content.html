@@ -1,24 +1,39 @@
-{% extends "interface/header.html" %}m
+{% extends "interface/header.html" %}
 {% block content %}
+{% load static %}
+<link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-row">
-                <div class="col-md-4 mb-3">
-                    <label for="name">Content name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Content name"
-                           value="{{ content.name }}" required>
-                </div>
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <label for="name">Content name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Content name"
+                       value="{{ content.name }}" required>
             </div>
-            <div class="form-row">
+        </div>
+        <div class="form-row">
+            <div class="col-6">
                 <label for="file">Upload file
                     <input type="file" class="form-control" id="file" name="file" placeholder="File"
-                    value="empty">
+                           value="empty">
                 </label>
             </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
-        </form>
-    </main>
+            <div class="col-6">
+                <label class="col-12">Content Preview</label>
+                {% if content.file_type == 'image' %}
+                IMAGE
+                <img class="preview" src="{{ BASE_DIR }}/{{ content.path }}"/>
+                {% elif content.file_type == 'pdf' %}
+                <div class="container">
+                    <iframe src="{{ BASE_DIR }}/{{ content.path }}" type="application/pdf" width="100%"></iframe>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+</main>
 
 {% endblock %}

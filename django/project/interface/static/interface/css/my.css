@@ -20,3 +20,8 @@ tr td:first-child:before
   counter-increment: Serial;
   content: counter(Serial);
 }
+
+.preview
+{
+ max-width:300px;
+}
