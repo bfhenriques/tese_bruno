@@ -1,12 +1,11 @@
-{% extends "interface/header.html" %}
-
+{% extends "interface/new_header.html" %}
+{% block page_title %}Views{% endblock %}
 {% block content %}
     {% load static %}
     <link href="{% static 'interface/css/view.css' %}" rel="stylesheet">
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
 
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Views</h1>
         </div>
 
         <div class="table-responsive">
@@ -38,23 +37,23 @@
                         <td>{{ view.last_modified }}</td>
                         {% if view.configured %}
                             <td>
-                                <svg data-feather="check"></svg>
+                                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">check</i>
                             </td>
                         {% else %}
                             <td>
-                                <svg data-feather="x"></svg>
+                                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">clear</i>
                             </td>
                         {% endif %}
                         {% if permission.pk == 1 %}
                             <td><a href="{% url 'permissions_views' pk=view.pk %}">
-                                <svg data-feather="lock"></svg>
+                                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">lock</i>
                             </a></td>
                         {% endif %}
                         <td><a href="{% url 'edit_view' pk=view.pk %}">
-                            <svg data-feather="edit-3"></svg>
+                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">edit</i>
                         </a></td>
                         <td><a href="{% url 'delete_view' pk=view.pk %}">
-                            <svg data-feather="trash-2"></svg>
+                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>
                         </a></td>
                     </tr>
                     <tr>

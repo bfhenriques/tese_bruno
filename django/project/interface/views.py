@@ -22,6 +22,10 @@ def login(request):
 def index(request):
     return render(request, 'interface/home.html', {'permission': get_user_permissions(request.user.pk)})
 
+@login_required
+def index(request):
+    return render(request, 'interface/home.html', {'permission': get_user_permissions(request.user.pk)})
+
 #### VIEWS ####
 @login_required
 def views(request):

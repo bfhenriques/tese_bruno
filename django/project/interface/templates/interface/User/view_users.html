@@ -1,10 +1,9 @@
-{% extends "interface/header.html" %}
-
+{% extends "interface/new_header.html" %}
+{% block page_title %}Users{% endblock %}
 {% block content %}
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
 
         <div class="d-flex justify-content-between flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Users</h1>
             <a class="btn btn-outline-secondary my-2 my-sm-0" href="{% url 'add_user' %}">Add user</a>
         </div>
 
@@ -30,10 +29,10 @@
                         <td>{{ user.timelines }}</td>
                         <td>{{ user.views }}</td>
                         <td><a href="{% url 'edit_user' pk=user.pk %}">
-                            <svg data-feather="edit-3"></svg>
+                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">edit</i>
                         </a></td>
                         <td><a href="{% url 'delete_user' pk=user.pk %}">
-                            <svg data-feather="trash-2"></svg>
+                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>
                         </a></td>
                     </tr>
                 {% endfor %}

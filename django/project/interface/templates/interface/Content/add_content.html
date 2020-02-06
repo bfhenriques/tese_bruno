@@ -1,4 +1,5 @@
-{% extends "interface/header.html" %}
+{% extends "interface/new_header.html" %}
+{% block page_title %}Add Content{% endblock %}
 {% block content %}
     {% load static %}
     <script src="{% static 'interface/js/contents.js' %}"></script>
@@ -6,11 +7,9 @@
     <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
     <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <h2>Add Content</h2>
-
             <div class="form-row">
                 <div class="col-md-4 mb-3">
                     <label for="name">Content name</label>

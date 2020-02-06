@@ -1,4 +1,5 @@
-{% extends "interface/header.html" %}
+{% extends "interface/new_header.html" %}
+{% block page_title %}Edit TimeLine{% endblock %}
 {% block content %}
     {% load static %}
     <script src="{% static 'interface/js/timelines.js' %}"></script>
@@ -8,13 +9,10 @@
     <script>var all_contents= "{{all_contents}}";</script>
     <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
 
         <form method="post">
             {% csrf_token %}
-
-            <h2>Edit timeline</h2>
-
             {{ form.as_p }}
 
             <label for="timeline_dropdown"></label>
@@ -43,7 +41,7 @@
             <button class="btn btn-primary" type="submit">Submit</button>
         </form>
         <br>
-        Preview: {{ BASE_DIR }}/{{ video_path }}
+        Preview:
         <br>
         <video width="400" height="300" controls>
           <source src="{{ BASE_DIR }}/{{ video_path }}" type="video/mp4">

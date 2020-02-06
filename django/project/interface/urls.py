@@ -5,6 +5,7 @@ from . import views, monitor
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('new/', views.index, name="new-index"),
     path('views/', views.views, name='view_views'),
     path('views/add/', views.add_view, name='add_view'),
     path('views/edit/<int:pk>/', views.edit_view, name='edit_view'),

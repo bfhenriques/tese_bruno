@@ -1,9 +1,10 @@
-{% extends "interface/header.html" %}
+{% extends "interface/new_header.html" %}
+{% block page_title %}Edit Content{% endblock %}
 {% block content %}
 {% load static %}
 <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-row">
@@ -23,7 +24,6 @@
             <div class="col-6">
                 <label class="col-12">Content Preview</label>
                 {% if content.file_type == 'image' %}
-                IMAGE
                 <img class="preview" src="{{ BASE_DIR }}/{{ content.path }}"/>
                 {% elif content.file_type == 'pdf' %}
                 <div class="container">
