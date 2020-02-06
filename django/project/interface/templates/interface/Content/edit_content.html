@@ -27,7 +27,7 @@
                 <img class="preview" src="{{ BASE_DIR }}/{{ content.path }}"/>
                 {% elif content.file_type == 'pdf' %}
                 <div class="container">
-                    <iframe src="{{ BASE_DIR }}/{{ content.path }}" type="application/pdf" width="100%"></iframe>
+                    <object data="{{ BASE_DIR }}/{{ content.path }}" type="application/pdf" width="100%"></object>
                 </div>
                 {% endif %}
             </div>

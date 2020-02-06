@@ -1,4 +1,4 @@
 coloredlogs==7.3
 screeninfo==0.3
-requests==2.18.1
+requests==2.20.0
 netifaces==0.10.6

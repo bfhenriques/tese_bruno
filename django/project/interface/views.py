@@ -256,7 +256,7 @@ def edit_timeline(request, pk):
                    "all_contents": json.dumps({"data": all_contents}),
                    "table_contents": json.dumps({"data": table_contents}),
                    'permission': get_user_permissions(request.user.pk),
-                   'video_path': 'media/Timelines/%s.mp4' % pk}
+                   'video_path': 'interface/media/Timelines/%s.mp4' % pk}
         return render(request, 'interface/Timeline/edit_timeline.html', context)
 
 @login_required
