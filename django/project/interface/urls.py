@@ -4,8 +4,8 @@ from django.conf.urls.static import static
 from . import views, monitor
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('new/', views.index, name="new-index"),
+    # path('', views.index, name='index'),
+    path('', views.index, name="index"),
     path('views/', views.views, name='view_views'),
     path('views/add/', views.add_view, name='add_view'),
     path('views/edit/<int:pk>/', views.edit_view, name='edit_view'),
@@ -20,6 +20,7 @@ urlpatterns = [
     path('contents/add/', views.add_content, name='add_content'),
     path('contents/edit/<int:pk>/', views.edit_content, name='edit_content'),
     path('contents/delete/<int:pk>/', views.delete_content, name='delete_content'),
+    path('contents/preview/<int:pk>/', views.download_content, name='download_content'),
 
     path('users/', views.users, name='view_users'),
     path('users/add/', views.add_user, name='add_user'),

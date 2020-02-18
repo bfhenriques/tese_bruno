@@ -25,7 +25,7 @@
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="images/android-desktop.png">
+    <!--<link rel="icon" sizes="192x192" href="images/android-desktop.png">-->
 
     <!-- Add to homescreen for Safari on iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -37,7 +37,7 @@
     <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
     <meta name="msapplication-TileColor" content="#3372DF">
 
-    <link rel="shortcut icon" href="images/favicon.png">
+    <!--<link rel="shortcut icon" href="images/favicon.png">-->
 
     <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
     <!--
@@ -72,6 +72,7 @@
     <script src="{% static 'interface/js/feather.min.js' %}"></script>
     <script src="{% static 'interface/js/bootstrap.bundle.js' %}"></script>
     <script src="{% static 'interface/js/bootstrap.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/js/bootstrap-select.min.js"></script>
 
     <link rel="stylesheet" href="{% static 'interface/css/bootstrap.min.css' %}" type="text/css"/>
     <link href="{% static 'interface/css/bootstrap.css' %}" rel="stylesheet">
@@ -79,6 +80,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'interface/css/bootstrap-theme.min.css' %}"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/css/bootstrap-select.min.css">
 
 </head>
 <body>
@@ -119,14 +121,14 @@
                 </button>
                 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
                     {% if permission.pk != 1 %}
-                    <li href="{% url 'edit_user' 0 %}" class="mdl-menu__item">Profile</li>
+                    <a href="{% url 'edit_user' 0 %}" class="mdl-menu__item">Profile</a>
                     {% endif %}
-                    <li href="{% url 'logout' %}" class="mdl-menu__item">Log Out</li>
+                    <a href="{% url 'logout' %}" class="mdl-menu__item">Log Out</a>
                 </ul>
             </div>
         </header>
         <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-            <a href="{% url 'new-index' %}" class="mdl-navigation__link"><i
+            <a href="{% url 'index' %}" class="mdl-navigation__link"><i
                     class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Dashboard</a>
             {% if permission.contents %}
             <a href="{% url 'view_contents' %}" class="mdl-navigation__link"><i

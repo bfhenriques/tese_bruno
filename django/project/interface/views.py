@@ -8,6 +8,8 @@ from .forms import UserCreateForm, UserEditForm, ContentForm, ContentEditForm, T
 from .scripts import file_manager
 import json
 import threading
+from preview_generator.manager import PreviewManager
+from django.http import FileResponse
 
 def get_user_permissions(pk):
     if pk == 1:
@@ -17,10 +19,6 @@ def get_user_permissions(pk):
 
 def login(request):
     return render(request, 'registration/login.html')
-
-@login_required
-def index(request):
-    return render(request, 'interface/home.html', {'permission': get_user_permissions(request.user.pk)})
 
 @login_required
 def index(request):
@@ -364,8 +362,28 @@ def edit_content(request, pk):
     else:
         form = ContentEditForm()
         content = Content.objects.get(pk=pk)
-        context = {'form': form, 'content': content, 'permission': get_user_permissions(request.user.pk)}
+        ''' print(content.path)
+        cache_path = '/tmp/preview_cache'
+        pdf_or_odt_to_preview_path = content.path
+
+        manager = PreviewManager(cache_path, create_folder=True)
+        path_to_preview_image = manager.get_jpeg_preview(pdf_or_odt_to_preview_path) '''
+
+        context = {'form': form,
+                   'content': content,
+                   'permission': get_user_permissions(request.user.pk)}
+
         return render(request, 'interface/Content/edit_content.html', context)
+        # return FileResponse(open(content.path, 'rb'), content_type='application/pdf')
+
+@login_required
+def download_content(request, pk):
+    if not get_user_permissions(request.user.pk)['contents']:
+        return render(request, 'error/access_denied.html')
+
+    content = Content.objects.get(pk=pk)
+
+    return FileResponse(open(content.path, 'rb'))
 
 @login_required
 def delete_content(request, pk):

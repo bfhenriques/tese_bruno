@@ -1,32 +1,37 @@
 {% extends "interface/new_header.html" %}
 {% block page_title %}Add Content{% endblock %}
 {% block content %}
-    {% load static %}
-    <script src="{% static 'interface/js/contents.js' %}"></script>
-    <script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
-    <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
+{% load static %}
+<script src="{% static 'interface/js/contents.js' %}"></script>
+<script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+<link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-row">
-                <div class="col-md-4 mb-3">
-                    <label for="name">Content name</label>
+<main role="main" class="container pt-3">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="col-6 fl">
+            <div class="form-row py-3">
+                <div class="col-12">
+                    <label for="name">Content Name</label>
                     <input type="text" class="form-control" id="name" name="name" placeholder="Content name"
                            value="{{ content.name }}" required>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="col-md-4 mb-3">
-                    <label for="file">Upload file
+            <div class="form-row py-3">
+                <div class="col-12">
+                    <label for="file">Upload File</label>
+                    <div class="files">
                         <input type="file" class="form-control" id="file" name="file" placeholder="File" required>
-                    </label>
+                    </div>
                 </div>
-                <img id="output_image" class="preview"/>
             </div>
             <button class="btn btn-primary" type="submit">Submit</button>
-        </form>
-    </main>
+        </div>
+        <div class="col-6 fr div-preview">
+            <img id="output_image" class="img-preview"/>
+        </div>
+    </form>
+</main>
 
 {% endblock %}

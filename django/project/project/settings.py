@@ -128,6 +128,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'interface/media/')
 # Login redirect
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'login'
 
 # Sessions
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
