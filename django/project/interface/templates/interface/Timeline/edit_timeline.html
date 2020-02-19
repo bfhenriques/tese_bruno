@@ -48,14 +48,15 @@
             <button class="btn btn-primary" type="submit">Submit</button>
         </div>
     </form>
-    <br>
-    Preview:
-    <br>
-    <video width="400" height="300" controls>
-        <source src="{{ BASE_DIR }}/{{ video_path }}" type="video/mp4">
-        Your browser does not support HTML5 video.
-    </video>
-
+    <div class="form-row py-3">
+        Preview:
+    </div>
+    <div class="form-row py-3">
+        <video width="400" height="300" controls>
+            <source src="{{ BASE_DIR }}/{{ video_path }}" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
 </main>
 
 {% endblock %}
