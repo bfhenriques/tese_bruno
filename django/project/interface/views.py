@@ -8,7 +8,6 @@ from .forms import UserCreateForm, UserEditForm, ContentForm, ContentEditForm, T
 from .scripts import file_manager
 import json
 import threading
-from preview_generator.manager import PreviewManager
 from django.http import FileResponse
 
 def get_user_permissions(pk):
