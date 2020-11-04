@@ -61,11 +61,10 @@ class CameraThread:
                     if not viewer_flag.is_set():
                         for (x, y, w, h) in faces:
                             face_crop = image[y:y+h, x:x+w]
-                            face_as_text = base64.b64encode(cv2.imencode('.jpg', face_crop)[1]).decode()
-                            faces_dict['faces'].append(face_as_text)
+                            retval, buffer = cv2.imencode('.jpg', face_crop)
+                            face_as_text = base64.b64encode(buffer)
+                            faces_dict['faces'].append(str(face_as_text))
                             index += 1
-
-                        print(faces_dict)
 
                         if faces_dict != {}:
                             with open('./faces.json', 'w') as outfile:
@@ -80,7 +79,6 @@ class Monitor:
     resolution = ''
     mac = ''
     file_path = ''
-    view = ''
 
     detection_start = time()
 
@@ -200,8 +198,6 @@ class Monitor:
         if response.status_code == 404:
             client.close()
             return False
-
-        self.view = self.file_path.split('/')[-1].split('.')[0]
 
         handle = open('view.%s' % self.file_path.split('.')[-1], 'wb')
         for chunk in response.iter_content(chunk_size=512):
@@ -348,7 +344,6 @@ class Monitor:
         csrftoken = client.cookies['csrftoken']
 
         faces = open('./faces.json', 'r').read()
-        print(faces)
 
         data = {
             'mac': self.mac,
