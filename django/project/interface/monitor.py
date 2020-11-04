@@ -65,8 +65,18 @@ def check_for_changes(request):
 
 def report(request):
     view = View.objects.get(mac=request.POST['mac'])
+    view_pk = view.pk
     viewing_time = request.POST['viewingtime']
-    print('View got attention for {} seconds.'.format(viewing_time))
+
+    try:
+        current_json = json.loads(open('report-data/' + str(view_pk) + '.json', 'r').read())
+        current_json['viewing_time'] = current_json['viewing_time'] + float(viewing_time)
+
+        with open('report-data/' + str(view_pk) + '.json', 'w') as outfile:
+            json.dump(current_json, outfile, ensure_ascii=False, indent=4)
+
+    except FileNotFoundError:
+        print('File not found')
 
     return JsonResponse({
         'ack': True
@@ -74,16 +84,32 @@ def report(request):
 
 
 def image_upload(request):
+    view = View.objects.get(mac=request.POST['mac'])
+    view_pk = view.pk
     faces = json.loads(request.POST['faces'])
-    print(faces)
-    index = 1
+
+    try:
+        current_json = json.loads(open('report-data/' + str(view_pk) + '.json', 'r').read())
+
+        if len(current_json) > 0:
+            for face in faces['faces']:
+                current_json['faces'].append(face)
+        else:
+            current_json['faces'] = faces['faces']
+
+        with open('report-data/' + str(view_pk) + '.json', 'w') as outfile:
+            json.dump(current_json, outfile, ensure_ascii=False, indent=4)
+
+    except FileNotFoundError:
+        print('File not found')
+
+    '''index = 1
     for face in faces['faces']:
-        print(face)
-        image = base64.b64decode(face)
+        image = base64.b64decode(face[2:-1])
         image_as_np = np.frombuffer(image, dtype=np.uint8)
         img = cv2.imdecode(image_as_np, flags=1)
-        cv2.imshow('face'+str(index), img)
-        index += 1
+        cv2.imwrite('./face'+str(index)+'.jpg', img)
+        index += 1'''
 
     return JsonResponse({
         'ack': True
