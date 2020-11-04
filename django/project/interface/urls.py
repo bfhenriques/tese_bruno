@@ -33,6 +33,8 @@ urlpatterns = [
 
     path('monitor/new_monitor/', monitor.new_monitor),
     path('monitor/check_for_changes/', monitor.check_for_changes),
+    path('monitor/report/', monitor.report),
+    path('monitor/image_upload/', monitor.image_upload)
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

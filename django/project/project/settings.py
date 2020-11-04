@@ -25,7 +25,7 @@ SECRET_KEY = 'buq0zt=su7*j$obvx2h%cdud9%5x%7gvr4*9i#f(o7hn9p3qxv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dmmd.ieeta.pt', 'localhost']
+ALLOWED_HOSTS = ['*']#['dmmd.ieeta.pt', 'localhost', '192.168.1.8']
 
 
 # Application definition
@@ -124,6 +124,8 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/interface/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'interface/media/')
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 # Login redirect
 LOGIN_URL = 'login'
