@@ -51,6 +51,12 @@ def new_monitor(request):
 def check_for_changes(request):
     view = View.objects.get(mac=request.POST['mac'])
 
+                                info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
+    info_json['display_time'] = info_json['display_time'] + 60
+
+    with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
+        json.dump(info_json, outfile, ensure_ascii=False, indent=4)
+
     if view.has_changed:
         view.has_changed = False
         view.save()
@@ -65,15 +71,14 @@ def check_for_changes(request):
 
 def report(request):
     view = View.objects.get(mac=request.POST['mac'])
-    view_pk = view.pk
     viewing_time = request.POST['viewingtime']
 
     try:
-        current_json = json.loads(open('report-data/' + str(view_pk) + '.json', 'r').read())
-        current_json['viewing_time'] = current_json['viewing_time'] + float(viewing_time)
+        info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
+        info_json['viewing_time'] = info_json['viewing_time'] + float(viewing_time)
 
-        with open('report-data/' + str(view_pk) + '.json', 'w') as outfile:
-            json.dump(current_json, outfile, ensure_ascii=False, indent=4)
+        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
+            json.dump(info_json, outfile, ensure_ascii=False, indent=4)
 
     except FileNotFoundError:
         print('File not found')
@@ -85,20 +90,18 @@ def report(request):
 
 def image_upload(request):
     view = View.objects.get(mac=request.POST['mac'])
-    view_pk = view.pk
     faces = json.loads(request.POST['faces'])
 
     try:
-        current_json = json.loads(open('report-data/' + str(view_pk) + '.json', 'r').read())
-
-        if len(current_json) > 0:
+        info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
+        if len(info_json['faces']) > 0:
             for face in faces['faces']:
-                current_json['faces'].append(face)
+                info_json['faces'].append(face)
         else:
-            current_json['faces'] = faces['faces']
+            info_json['faces'] = faces['faces']
 
-        with open('report-data/' + str(view_pk) + '.json', 'w') as outfile:
-            json.dump(current_json, outfile, ensure_ascii=False, indent=4)
+        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
+            json.dump(info_json, outfile, ensure_ascii=False, indent=4)
 
     except FileNotFoundError:
         print('File not found')

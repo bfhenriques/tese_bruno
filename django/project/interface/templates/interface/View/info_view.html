@@ -1,0 +1,68 @@
+{% extends "interface/new_header.html" %}
+{% block page_title %}View Info{% endblock %}
+{% block content %}
+    {% load static %}
+    <script src="{% static 'interface/js/views.js' %}"></script>
+    <script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+        <div class="row">
+            <div class="col-2 text-right"><strong>Display time (sec):</strong></div>
+            <div class="col-auto">{{info.display_time|floatformat:0}}</div>
+        </div>
+        <div class="row">
+            <div class="col-2 text-right"><strong>Viewing time (sec):</strong></div>
+            <div class="col-auto">{{info.viewing_time|floatformat:0}}</div>
+        </div>
+        <div class="row">
+            <div class="col-2 text-right"><strong>Viewing time (%):</strong></div>
+            <div class="col-auto">{{info.viewing_time_percentage|floatformat:0}}</div>
+        </div>
+        <div class="row">
+            <div class="col-2 text-right"><strong>Number of recorded faces:</strong></div>
+            <div class="col-auto">{{info.faces|length}}</div>
+        </div>
+        <div class="row">
+            <div class="">
+                {% for face in info.faces %}
+                    <img src="data:image/jpeg;base64,{{face|slice:'2:-1'}}">
+                {% endfor %}
+            </div>
+        </div>
+
+        <!--<form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <label for="view_dropdown"></label>
+            <select id="view_dropdown" name="view_dropdown">
+                <option selected value="">Choose...</option>
+            </select>
+            <input type="button" value="Add" onclick="addTimeline()"/>
+
+            <table class="table table-striped table-sm" id="add_table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Duration</th>
+                    <th>Creator</th>
+                    <th>Contents</th>
+                    <th>Creation date</th>
+                    <th>Last modified</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <input type="hidden" class="form-control" id="timelines" name="timelines" value="">
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>-->
+    </main>
+
+{% endblock %}

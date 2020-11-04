@@ -9,6 +9,7 @@ urlpatterns = [
     path('views/', views.views, name='view_views'),
     path('views/add/', views.add_view, name='add_view'),
     path('views/edit/<int:pk>/', views.edit_view, name='edit_view'),
+    path('views/info/<int:pk>/', views.info_view, name='info_view'),
     path('views/delete/<int:pk>/', views.delete_view, name='delete_view'),
 
     path('timelines/', views.timelines, name='view_timelines'),

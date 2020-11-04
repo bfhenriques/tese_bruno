@@ -45,14 +45,17 @@
                             </td>
                         {% endif %}
                         {% if permission.pk == 1 %}
-                            <td><a href="{% url 'permissions_views' pk=view.pk %}">
+                            <td><a href="{% url 'permissions_views' pk=view.pk %}" title="lock">
                                 <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">lock</i>
                             </a></td>
                         {% endif %}
-                        <td><a href="{% url 'edit_view' pk=view.pk %}">
+                        <td><a href="{% url 'edit_view' pk=view.pk %}" title="edit">
                             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">edit</i>
                         </a></td>
-                        <td><a href="{% url 'delete_view' pk=view.pk %}">
+                        <td><a href="{% url 'info_view' pk=view.pk %}" title="info">
+                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">info</i>
+                        </a></td>
+                        <td><a href="{% url 'delete_view' pk=view.pk %}" title="delete">
                             <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>
                         </a></td>
                     </tr>

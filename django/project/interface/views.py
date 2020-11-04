@@ -10,18 +10,22 @@ import json
 import threading
 from django.http import FileResponse
 
+
 def get_user_permissions(pk):
     if pk == 1:
         return {'pk': 1, 'contents': True, 'timelines': True, 'views': True, 'users': True}
     else:
         return UserProfile.objects.get(user_id=pk).as_dict()
 
+
 def login(request):
     return render(request, 'registration/login.html')
+
 
 @login_required
 def index(request):
     return render(request, 'interface/home.html', {'permission': get_user_permissions(request.user.pk)})
+
 
 #### VIEWS ####
 @login_required
@@ -40,6 +44,7 @@ def views(request):
 
     context = {'views_list': ret, 'permission': get_user_permissions(request.user.pk)}
     return render(request, 'interface/View/view_views.html', context)
+
 
 @login_required
 def add_view(request):
@@ -79,6 +84,7 @@ def add_view(request):
                    "table_timelines": json.dumps({"data": {}}),
                    'permission': get_user_permissions(request.user.pk)}
         return render(request, 'interface/View/add_view.html', context)
+
 
 @login_required
 def edit_view(request, pk):
@@ -131,6 +137,42 @@ def edit_view(request, pk):
 
 
 @login_required
+def info_view(request, pk):
+
+    if not get_user_permissions(request.user.pk)['views']:
+        return render(request, 'error/access_denied.html')
+
+    view = View.objects.get(pk=pk)
+    form = ViewForm(initial={
+        'name': view.name,
+        'resolution': view.resolution,
+        'mac': view.mac
+    })
+
+    info = None
+    try:
+        info = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
+        info['viewing_time_percentage'] = 100 * info['viewing_time'] / info['display_time']
+        print(info)
+
+    except FileNotFoundError:
+        print('File not found')
+
+    '''table_timelines = []
+    for timeline in ViewTimelines.objects.filter(view_id=pk).order_by("orderindex"):
+        table_timelines.append(Timeline.objects.get(pk=timeline.timeline.pk).as_dict())
+
+    all_timelines = [timeline.as_dict() for timeline in Timeline.objects.order_by('creation_date')]'''
+
+    context = {"form": form,
+               # "all_timelines": json.dumps({"data": all_timelines}),
+               # "table_timelines": json.dumps({"data": table_timelines}),
+               'info': info,
+               'permission': get_user_permissions(request.user.pk)}
+    return render(request, 'interface/View/info_view.html', context)
+
+
+@login_required
 def delete_view(request, pk):
     if not get_user_permissions(request.user.pk)['views']:
         return render(request, 'error/access_denied.html')
@@ -160,6 +202,7 @@ def timelines(request):
 
     context = {'timelines_list': ret, 'permission': get_user_permissions(request.user.pk)}
     return render(request, 'interface/Timeline/view_timelines.html', context)
+
 
 @login_required
 def add_timeline(request):
@@ -209,6 +252,7 @@ def add_timeline(request):
                    'table_contents': json.dumps({"data": {}}),
                    'permission': get_user_permissions(request.user.pk)}
         return render(request, 'interface/Timeline/add_timeline.html', context)
+
 
 @login_required
 def edit_timeline(request, pk):
@@ -260,6 +304,7 @@ def edit_timeline(request, pk):
                    'video_path': 'interface/media/Timelines/%s.mp4' % pk}
         return render(request, 'interface/Timeline/edit_timeline.html', context)
 
+
 @login_required
 def delete_timeline(request, pk):
     if not get_user_permissions(request.user.pk)['timelines']:
@@ -288,6 +333,7 @@ def contents(request):
 
     context = {'contents_list': ret, 'permission': get_user_permissions(request.user.pk)}
     return render(request, 'interface/Content/view_contents.html', context)
+
 
 @login_required
 def add_content(request):
@@ -327,6 +373,7 @@ def add_content(request):
     else:
         form = ContentForm()
         return render(request, 'interface/Content/add_content.html', {'form': form, 'permission': get_user_permissions(request.user.pk)})
+
 
 @login_required
 def edit_content(request, pk):
@@ -375,6 +422,7 @@ def edit_content(request, pk):
         return render(request, 'interface/Content/edit_content.html', context)
         # return FileResponse(open(content.path, 'rb'), content_type='application/pdf')
 
+
 @login_required
 def download_content(request, pk):
     if not get_user_permissions(request.user.pk)['contents']:
@@ -383,6 +431,7 @@ def download_content(request, pk):
     content = Content.objects.get(pk=pk)
 
     return FileResponse(open(content.path, 'rb'))
+
 
 @login_required
 def delete_content(request, pk):
@@ -406,6 +455,7 @@ def users(request):
         users_list.append(user.as_dict())
     context = {'users_list': users_list, 'permission': get_user_permissions(request.user.pk)}
     return render(request, 'interface/User/view_users.html', context)
+
 
 @login_required
 def add_user(request):
@@ -448,6 +498,7 @@ def edit_user(request, pk):
         return render(request, 'interface/User/edit_user.html', context)
 
     return redirect('view_users')
+
 
 @login_required
 def delete_user(request, pk):
