@@ -8,6 +8,7 @@ import cv2
 import base64
 import numpy as np
 import json
+from .digitalsignage import FaceRecognition as df
 
 
 def new_monitor(request):
