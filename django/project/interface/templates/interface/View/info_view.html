@@ -12,20 +12,21 @@
             <div class="col-2 text-right"><strong>Display time (sec):</strong></div>
             <div class="col-auto">{{info.display_time|floatformat:0}}</div>
         </div>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-2 text-right"><strong>Viewing time (sec):</strong></div>
             <div class="col-auto">{{info.viewing_time|floatformat:0}}</div>
         </div>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-2 text-right"><strong>Viewing time (%):</strong></div>
             <div class="col-auto">{{info.viewing_time_percentage|floatformat:0}}</div>
         </div>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-2 text-right"><strong>Number of recorded faces:</strong></div>
             <div class="col-auto">{{info.faces|length}}</div>
         </div>
-        <div class="row">
-            <div class="">
+        <div class="row mt-2">
+            <div class="col-2 text-right"><strong>Saved faces:</strong></div>
+            <div class="col" style="background-color: lightgrey">
                 {% for face in info.faces %}
                     <img src="data:image/jpeg;base64,{{face|slice:'2:-1'}}">
                 {% endfor %}

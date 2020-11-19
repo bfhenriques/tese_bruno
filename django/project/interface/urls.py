@@ -34,6 +34,8 @@ urlpatterns = [
 
     path('monitor/new_monitor/', monitor.new_monitor),
     path('monitor/check_for_changes/', monitor.check_for_changes),
+    path('monitor/view_start/', monitor.view_start),
+    path('monitor/viewer_detected/', monitor.viewer_detected),
     path('monitor/report/', monitor.report),
     path('monitor/image_upload/', monitor.image_upload)
 

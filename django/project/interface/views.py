@@ -95,6 +95,7 @@ def edit_view(request, pk):
         view = View.objects.get(pk=pk)
         form = ViewForm(request.POST, instance=view)
         if form.is_valid():
+            print(form.cleaned_data)
             post = form.save(commit=False)
             post.last_modified = timezone.now()
             post.has_changed = False
@@ -153,20 +154,11 @@ def info_view(request, pk):
     try:
         info = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
         info['viewing_time_percentage'] = 100 * info['viewing_time'] / info['display_time']
-        print(info)
 
     except FileNotFoundError:
         print('File not found')
 
-    '''table_timelines = []
-    for timeline in ViewTimelines.objects.filter(view_id=pk).order_by("orderindex"):
-        table_timelines.append(Timeline.objects.get(pk=timeline.timeline.pk).as_dict())
-
-    all_timelines = [timeline.as_dict() for timeline in Timeline.objects.order_by('creation_date')]'''
-
     context = {"form": form,
-               # "all_timelines": json.dumps({"data": all_timelines}),
-               # "table_timelines": json.dumps({"data": table_timelines}),
                'info': info,
                'permission': get_user_permissions(request.user.pk)}
     return render(request, 'interface/View/info_view.html', context)

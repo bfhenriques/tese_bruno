@@ -21,10 +21,20 @@ def new_monitor(request):
         view.name = '(new)'
         view.creation_date = timezone.now()
         view.last_modified = timezone.now()
+        view.display_time = 0.0
         view.has_changed = False
         view.configured = False
 
         view.save(force_insert=True)
+
+        view_report_data = {
+            'display_time': 0,
+            'viewing_time': 0,
+            'faces': []
+        }
+
+        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
+            json.dump(view_report_data, outfile, ensure_ascii=False, indent=4)
 
         return JsonResponse({
             'ack': True,
@@ -50,12 +60,16 @@ def new_monitor(request):
 
 def check_for_changes(request):
     view = View.objects.get(mac=request.POST['mac'])
+    view.display_time = view.display_time + 60
 
-                                info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
-    info_json['display_time'] = info_json['display_time'] + 60
+    '''try:
+        info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
+        info_json['display_time'] = info_json['display_time'] + 60
 
-    with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
-        json.dump(info_json, outfile, ensure_ascii=False, indent=4)
+        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
+            json.dump(info_json, outfile, ensure_ascii=False, indent=4)
+    except FileNotFoundError:
+        print('File not found')'''
 
     if view.has_changed:
         view.has_changed = False
@@ -64,13 +78,39 @@ def check_for_changes(request):
             'has_changed': True
         })
 
+    view.save()
     return JsonResponse({
         'has_changed': False
     })
 
 
-def report(request):
+def view_start(request):
     view = View.objects.get(mac=request.POST['mac'])
+    view.last_start = request.POST['start_time']
+    view.save()
+    return JsonResponse({
+        'ack': True
+    })
+
+
+def viewer_detected(request):
+    view = View.objects.get(mac=request.POST['mac'])
+
+    shape = request.POST['shape']
+    bb = request.POST['bb']
+    rep = []
+    for i in range(len(bb)):
+        rep.append()
+
+    return JsonResponse({
+        'ack': True
+    })
+
+
+def report(request):
+    print(request.POST)
+
+    '''view = View.objects.get(mac=request.POST['mac'])
     viewing_time = request.POST['viewingtime']
 
     try:
@@ -81,7 +121,7 @@ def report(request):
             json.dump(info_json, outfile, ensure_ascii=False, indent=4)
 
     except FileNotFoundError:
-        print('File not found')
+        print('File not found')'''
 
     return JsonResponse({
         'ack': True

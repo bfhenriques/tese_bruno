@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import Content, Timeline, View, UserProfile
 
+
 class UserCreateForm(UserCreationForm):
     email = forms.EmailField(required=True)
     contents = forms.BooleanField(initial=False, required=False)
@@ -28,6 +29,7 @@ class UserCreateForm(UserCreationForm):
 
         return user
 
+
 class UserEditForm(UserChangeForm):
     email = forms.EmailField(required=True)
     contents = forms.BooleanField(initial=False, required=False)
@@ -50,6 +52,7 @@ class ContentForm(forms.ModelForm):
         model = Content
         fields = ('name', 'file', )
 
+
 class ContentEditForm(forms.ModelForm):
     name = forms.CharField()
     file = forms.FileField(required=False)
@@ -69,7 +72,6 @@ class TimelineForm(forms.ModelForm):
 
     def save(self, commit=True):
         timeline = super(TimelineForm, self).save(commit=False)
-
         if commit:
             timeline.save()
 

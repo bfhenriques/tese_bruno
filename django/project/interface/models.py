@@ -49,6 +49,7 @@ class Content(models.Model):
             "permissions": [user.as_dict() for user in self.permissions.all()]
         }
 
+
 class Timeline(models.Model):
     name = models.CharField(max_length=140)
     creation_date = models.DateTimeField()
@@ -79,6 +80,7 @@ class Timeline(models.Model):
             "permissions": [user.as_dict() for user in self.permissions.all()]
         }
 
+
 class View(models.Model):
     name = models.CharField(max_length=140)
     resolution = models.CharField(max_length=15)
@@ -88,6 +90,8 @@ class View(models.Model):
     configured = models.BooleanField()
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
+    display_time = models.FloatField()
+    last_start = models.DateTimeField()
 
     def __str__(self):
         return self.name
@@ -111,7 +115,8 @@ class View(models.Model):
             "configured": self.configured,
             "duration": duration,
             "timelines": timelines,
-            "permissions": [user.as_dict() for user in self.permissions.all()]
+            "permissions": [user.as_dict() for user in self.permissions.all()],
+            "display_time": self.display_time
         }
 
 
