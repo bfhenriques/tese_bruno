@@ -217,20 +217,20 @@ class SharedSpace:
         client.close()
         return True
 
-    def viewer_detected(self, shape, bb):
+    def viewer_detected(self, frame, shape, bb):
         logger.info('Viewer(s) detection start - absolute: {} - relative: {}'.format(time(), self.omxp.position()))
 
         success = False
         while not success:
             try:
-                success = self.report_viewer_detected(self, shape, bb)
+                success = self.report_viewer_detected(self, frame, shape, bb)
                 if not success:
                     logger.info('Problem reporting attention start')
 
             except:
                 logger.info('Problem reporting attention start')
 
-    def report_viewer_detected(self, shape, bb):
+    def report_viewer_detected(self, frame, shape, bb):
         logging.info('Reporting attention start')
         client = requests.session()
 
@@ -248,7 +248,8 @@ class SharedSpace:
             'absolute_time': datetime.now(),
             'relative_time': self.omxp.position(),
             'shape': shape,
-            'bb': bb
+            'bb': bb,
+            'frame': frame
         }
 
         response = client.post(SERVER_URL + 'monitor/viewer_detected/', data=data)
@@ -260,7 +261,7 @@ class SharedSpace:
         client.close()
         return True
 
-    def viewer_detection_end(self):
+    '''def viewer_detection_end(self):
         self.detection_end = self.omxp.position()
         logger.info('Viewer(s) detection end - {}'.format(self.omxp.position()))
 
@@ -330,7 +331,7 @@ class SharedSpace:
             return False
 
         client.close()
-        return True
+        return True'''
 
 
 class CameraThread(Thread):
@@ -346,14 +347,15 @@ class CameraThread(Thread):
             camera.framerate = 24
 
             while True:
-                image = np.empty((240, 320, 3), dtype=np.uint8)
-                camera.capture(image, 'bgr')
+                frame = np.empty((240, 320, 3), dtype=np.uint8)
+                camera.capture(frame, 'bgr')
 
-                shape, bb = self.shared.detect_face(self.shared, image)
+                shape, bb = self.shared.detect_face(self.shared, frame)
 
                 if len(shape) > 0:
-                    logging.info('face detected')
-                    self.shared.viewer_detected(self.shared, shape, bb)
+                    retval, buffer = cv2.imencode('.jpg', frame)
+                    frame_as_text = base64.b64encode(buffer)
+                    self.shared.viewer_detected(self.shared, frame_as_text, shape, bb)
 
 
 class MonitorThread(Thread):

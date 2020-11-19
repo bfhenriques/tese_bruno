@@ -27,14 +27,14 @@ def new_monitor(request):
 
         view.save(force_insert=True)
 
-        view_report_data = {
+        '''view_report_data = {
             'display_time': 0,
             'viewing_time': 0,
             'faces': []
         }
 
         with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
-            json.dump(view_report_data, outfile, ensure_ascii=False, indent=4)
+            json.dump(view_report_data, outfile, ensure_ascii=False, indent=4)'''
 
         return JsonResponse({
             'ack': True,
@@ -94,13 +94,16 @@ def view_start(request):
 
 
 def viewer_detected(request):
+    print(request.POST)
     view = View.objects.get(mac=request.POST['mac'])
-
+    # fr = df.FaceNet()
+    frame = request.POST['frame']
     shape = request.POST['shape']
     bb = request.POST['bb']
     rep = []
-    for i in range(len(bb)):
-        rep.append()
+
+    # for i in range(len(bb)):
+    #     rep.append(fr.calc_face_descriptor(frame, bb[i]))
 
     return JsonResponse({
         'ack': True
