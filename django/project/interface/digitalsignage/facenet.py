@@ -38,7 +38,7 @@ from scipy import interpolate
 from tensorflow.python.training import training
 import random
 import re
-from tensorflow.python.platform import gfile
+from pathlib import Path
 
 def triplet_loss(anchor, positive, negative, alpha):
     """Calculate the triplet loss according to the FaceNet paper
@@ -372,10 +372,10 @@ def load_model(model):
     # Check if the model is a model directory (containing a metagraph and a checkpoint file)
     #  or if it is a protobuf file with a frozen graph
     model_exp = os.path.expanduser(model)
-    if (os.path.isfile(model_exp)):
+    if os.path.isfile(model_exp):
         print('Model filename: %s' % model_exp)
-        with gfile.FastGFile(model_exp,'rb') as f:
-            graph_def = tf.GraphDef()
+        with tf.io.gfile.GFile(model_exp, 'rb') as f:
+            graph_def = tf.compat.v1.GraphDef()
             graph_def.ParseFromString(f.read())
             tf.import_graph_def(graph_def, name='')
     else:

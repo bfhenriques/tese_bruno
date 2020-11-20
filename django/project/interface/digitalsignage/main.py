@@ -1,12 +1,13 @@
 import os
-import FaceRecognition as df
-import processing as pr
-import handle_vectors as aux
+from . import FaceRecognition as df
+from . import processing as pr
+from . import handle_vectors as aux
 import numpy as np
 import cv2
 import sys
-import dlib
+# import dlib
 import math
+
 
 def recognition(fr, shape, bb, frame, rep, average_attention):
 	# Database empty --------------------------------------------------------------------------------------
@@ -31,7 +32,6 @@ def recognition(fr, shape, bb, frame, rep, average_attention):
 			cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 			id_size += 1
 
-
 	elif id_size > 0: 
 		d_values = {}
 		for i in range(0,len(bb)):
@@ -46,6 +46,7 @@ def recognition(fr, shape, bb, frame, rep, average_attention):
 
 			print('Prediction: ' + str(best_comparison))
 			print(confidence)
+
 			#The candidate might be in the database
 			if(confidence <= fr.threshold):
 				aux.update_face_descriptors(fr, rep[i], best_comparison)
@@ -85,9 +86,7 @@ def recognition(fr, shape, bb, frame, rep, average_attention):
 				id_size += 1
 
 
-
-
-try:
+'''try:
 	np.seterr(divide='ignore', invalid='ignore')
 	fr = df.FaceNet()
 	detector = dlib.get_frontal_face_detector()
@@ -101,33 +100,29 @@ try:
 	list_files = os.listdir(path)
 	id_size = len(list_files)
 
-	for i in range(0,id_size):
+	for i in range(0, id_size):
 		average_attention[i] = []
 
 	while True:
 		ret, frame = video_capture.read()
 
 		if len(pr.refPt) == 2:
-			cv2.circle(frame, (pr.refPt[0], pr.refPt[1]), 10, (0,0,255), -1)
-
+			cv2.circle(frame, (pr.refPt[0], pr.refPt[1]), 10, (0, 0, 255), -1)
 
 		shape, bb = pr.detect_face(frame, detector, predictor)
 		rep = []
 		for i in range(len(bb)):
 			rep.append(fr.calc_face_descriptor(frame, bb[i]))
 
-
 		recognition(fr, shape, bb, frame, rep, average_attention)
 
 		for i in range(len(bb)):
-			cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3] ), (0,255,0), 2)
+			cv2.rectangle(frame, (bb[i][0], bb[i][1]), (bb[i][2], bb[i][3]), (0, 255, 0), 2)
 
-
-			  	
 		cv2.namedWindow('Frame', cv2.WINDOW_NORMAL)
 		cv2.resizeWindow('Frame', 1280, 720)
 		cv2.setMouseCallback('Frame', pr.reference_point)
-		cv2.imshow('Frame',frame)
+		cv2.imshow('Frame', frame)
 
 		if cv2.waitKey(30) & 0xFF == ord('q'):
 			if len(pr.refPt) == 2:
@@ -142,4 +137,4 @@ except KeyboardInterrupt:
 	sys.exit()
 
 video_capture.release()
-cv2.destroyAllWindows()
+cv2.destroyAllWindows()'''

@@ -9,6 +9,8 @@ import base64
 import numpy as np
 import json
 from .digitalsignage import FaceRecognition as df
+from .digitalsignage import processing as pr
+from .digitalsignage import main as rc
 
 
 def new_monitor(request):
@@ -27,15 +29,6 @@ def new_monitor(request):
         view.configured = False
 
         view.save(force_insert=True)
-
-        '''view_report_data = {
-            'display_time': 0,
-            'viewing_time': 0,
-            'faces': []
-        }
-
-        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
-            json.dump(view_report_data, outfile, ensure_ascii=False, indent=4)'''
 
         return JsonResponse({
             'ack': True,
@@ -95,16 +88,31 @@ def view_start(request):
 
 
 def viewer_detected(request):
-    print(request.POST)
     view = View.objects.get(mac=request.POST['mac'])
-    # fr = df.FaceNet()
+    pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
+    fr = df.FaceNet()
+
+    average_attention = {}
+
+    path = fr.path_to_vectors
+    list_files = os.listdir(path)
+    id_size = len(list_files)
+
+    for i in range(0, id_size):
+        average_attention[i] = []
+
     frame = request.POST['frame']
     shape = request.POST['shape']
     bb = request.POST['bb']
     rep = []
 
-    # for i in range(len(bb)):
-    #     rep.append(fr.calc_face_descriptor(frame, bb[i]))
+    for i in range(len(bb)):
+        rep.append(fr.calc_face_descriptor(frame, bb[i]))
+
+    rc.recognition(fr, shape, bb, rep, average_attention)
+
+    pr.graphics(average_attention)
+    pr.save_data(average_attention)
 
     return JsonResponse({
         'ack': True
