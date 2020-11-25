@@ -8,6 +8,7 @@ import cv2
 import base64
 import numpy as np
 import json
+import ast
 from .digitalsignage import FaceRecognition as df
 from .digitalsignage import processing as pr
 from .digitalsignage import main as rc
@@ -88,6 +89,7 @@ def view_start(request):
 
 
 def viewer_detected(request):
+    print(request.POST['frame'])
     view = View.objects.get(mac=request.POST['mac'])
     pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
     fr = df.FaceNet()
@@ -101,15 +103,15 @@ def viewer_detected(request):
     for i in range(0, id_size):
         average_attention[i] = []
 
-    frame = request.POST['frame']
-    shape = request.POST['shape']
-    bb = request.POST['bb']
+    frame_as_np = np.frombuffer(base64.b64decode(request.POST['frame']), dtype=np.uint8)
+    frame = cv2.imdecode(frame_as_np, flags=1)
+    shape = ast.literal_eval(request.POST['shape'][7:-2])
+    bb = tuple(map(int, request.POST['bb'][1:-1].split(', ')))
     rep = []
 
-    for i in range(len(bb)):
-        rep.append(fr.calc_face_descriptor(frame, bb[i]))
+    rep.append(fr.calc_face_descriptor(frame, bb))
 
-    rc.recognition(fr, shape, bb, rep, average_attention)
+    rc.recognition(fr, shape, bb, frame, rep, average_attention, id_size)
 
     pr.graphics(average_attention)
     pr.save_data(average_attention)

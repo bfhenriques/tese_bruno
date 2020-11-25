@@ -34,7 +34,7 @@ logger.addHandler(fileHandler)
 logger.propagate = False
 
 # SERVER_URL = 'http://dmmd.ieeta.pt/'
-SERVER_URL = 'http://192.168.1.103/'
+SERVER_URL = 'http://192.168.1.106/'
 
 viewer_flag = Event()
 
@@ -247,8 +247,8 @@ class SharedSpace:
             'csrfmiddlewaretoken': csrftoken,
             'absolute_time': datetime.now(),
             'relative_time': self.omxp.position(),
-            'shape': shape,
-            'bb': bb,
+            'shape': str(shape),
+            'bb': str(bb),
             'frame': frame
         }
 
@@ -353,9 +353,11 @@ class CameraThread(Thread):
                 shape, bb = self.shared.detect_face(self.shared, frame)
 
                 if len(shape) > 0:
-                    retval, buffer = cv2.imencode('.jpg', frame)
-                    frame_as_text = base64.b64encode(buffer)
-                    self.shared.viewer_detected(self.shared, frame_as_text, shape, bb)
+                    for i in range(len(bb)):
+                        cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
+                        retval, buffer = cv2.imencode('.jpg', cropped_frame)
+                        frame_as_text = base64.b64encode(buffer)
+                        self.shared.viewer_detected(self.shared, frame_as_text, shape, bb[i])
 
 
 class MonitorThread(Thread):

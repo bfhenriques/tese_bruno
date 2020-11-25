@@ -9,81 +9,76 @@ import sys
 import math
 
 
-def recognition(fr, shape, bb, frame, rep, average_attention):
+def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
 	# Database empty --------------------------------------------------------------------------------------
-	global id_size
 	if id_size == 0:
-		for i in range(0,len(bb)):
-			aux.new_face_descriptors(fr, rep[i], id_size)
-			average_attention[id_size] = []
+		aux.new_face_descriptors(fr, rep[0], id_size)
+		average_attention[id_size] = []
 
-			if(len(pr.refPt)==2):
-				attention = pr.head_pose(frame, shape[i])
-				if math.isnan(attention) == False:
-					average_attention[id_size].append(attention)
-					att_text = "Focus: " + str(round(attention)) + "%"
-					att_x = bb[i][0]-10
-					att_y = bb[i][3]+20
-					cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+		if(len(pr.refPt)==2):
+			attention = pr.head_pose(frame, shape)
+			if math.isnan(attention) == False:
+				average_attention[id_size].append(attention)
+				att_text = "Focus: " + str(round(attention)) + "%"
+				att_x = bb[0]-10
+				att_y = bb[3]+20
+				cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
-			box_text = "New ID " + str(id_size)
-			pos_x = bb[i][0]-10 
-			pos_y = bb[i][1]-10
-			cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
-			id_size += 1
+		box_text = "New ID " + str(id_size)
+		pos_x = bb[0]-10
+		pos_y = bb[1]-10
+		cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
 	elif id_size > 0: 
 		d_values = {}
-		for i in range(0,len(bb)):
-			#Recognition block --------------------------------------------------
-			for person in range(0,id_size):
-				folder = fr.path_to_vectors + "Person" + str(person) +"/"
-				d = aux.compare_descriptors(fr, folder, rep[i])
-				d_values[person] = d
+		#Recognition block --------------------------------------------------
+		for person in range(0, id_size):
+			folder = fr.path_to_vectors + "Person" + str(person) + "/"
+			d = aux.compare_descriptors(fr, folder, rep)
+			d_values[person] = d
 
-			best_comparison = min(d_values, key = d_values.get)
-			confidence = d_values[best_comparison]
+		best_comparison = min(d_values, key=d_values.get)
+		confidence = d_values[best_comparison]
 
-			print('Prediction: ' + str(best_comparison))
-			print(confidence)
+		print('Prediction: ' + str(best_comparison))
+		print(confidence)
 
-			#The candidate might be in the database
-			if(confidence <= fr.threshold):
-				aux.update_face_descriptors(fr, rep[i], best_comparison)
-				box_text = 'ID ' + str(best_comparison)
-				pos_x = bb[i][0]-10 
-				pos_y = bb[i][1]-10
-				cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+		#The candidate might be in the database
+		if(confidence <= fr.threshold):
+			aux.update_face_descriptors(fr, rep[0], best_comparison)
+			box_text = 'ID ' + str(best_comparison)
+			pos_x = bb[0]-10
+			pos_y = bb[1]-10
+			cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
-				if(len(pr.refPt)==2):
-					attention = pr.head_pose(frame, shape[i])
-					if math.isnan(attention) == False:
-						average_attention[best_comparison].append(attention)
-						att_text = "Focus: " + str(round(attention)) + "%"
-						att_x = bb[i][0]-10
-						att_y = bb[i][3]+20
-						cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+			if(len(pr.refPt)==2):
+				attention = pr.head_pose(frame, shape)
+				if math.isnan(attention) == False:
+					average_attention[best_comparison].append(attention)
+					att_text = "Focus: " + str(round(attention)) + "%"
+					att_x = bb[0]-10
+					att_y = bb[3]+20
+					cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
 
-			#The candidate might not be in the database
-			else:
-				aux.new_face_descriptors(fr, rep[i], id_size)
-				average_attention[id_size] = []
+		#The candidate might not be in the database
+		else:
+			aux.new_face_descriptors(fr, rep[0], id_size)
+			average_attention[id_size] = []
 
-				box_text = 'New ID ' + str(id_size)
-				pos_x = bb[i][0]-10 
-				pos_y = bb[i][1]-10
-				cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+			box_text = 'New ID ' + str(id_size)
+			pos_x = bb[0]-10
+			pos_y = bb[1]-10
+			cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
-				if(len(pr.refPt)==2):
-					attention = pr.head_pose(frame, shape[i])
-					if math.isnan(attention) == False:
-						average_attention[id_size].append(attention)
-						att_text = "Focus: " + str(round(attention)) + "%"
-						att_x = bb[i][0]-10
-						att_y = bb[i][3]+20
-						cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
-				id_size += 1
+			if(len(pr.refPt)==2):
+				attention = pr.head_pose(frame, shape)
+				if math.isnan(attention) == False:
+					average_attention[id_size].append(attention)
+					att_text = "Focus: " + str(round(attention)) + "%"
+					att_x = bb[0]-10
+					att_y = bb[3]+20
+					cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
 
 '''try:

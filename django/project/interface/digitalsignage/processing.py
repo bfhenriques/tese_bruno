@@ -175,7 +175,7 @@ def save_data(average_attention):
             average = sum(average_attention[i]) / len(average_attention[i])
             save_average[i] = average
 
-    f = open('Graphs/data.txt', 'w')
+    f = open('interface/digitalsignage/Graphs/data.txt', 'w')
 
     for y, z in save_average.items():
         f.write('ID ' + str(y) + '\n')
@@ -199,7 +199,7 @@ def save_attention_levels(average_attention):
 
 
 def store(frame, i):
-    filename = "Results/image" + str(i) + ".png"
+    filename = "interface/digitalsignage/Results/image" + str(i) + ".png"
     cv2.imwrite(filename, frame)
 
 
@@ -219,5 +219,5 @@ def graphics(y_values):
             plt.xlabel('Frames')
             plt.ylim(-0.5, 1.5)
             plt.step(rand_x, z_aux)
-            plt.savefig('Graphs/ID_' + str(x) + '.png')
+            plt.savefig('interface/digitalsignage/Graphs/ID_' + str(x) + '.png')
             plt.close(fig)
