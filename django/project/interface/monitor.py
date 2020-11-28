@@ -89,20 +89,17 @@ def view_start(request):
 
 
 def viewer_detected(request):
-    print(request.POST['frame'])
     view = View.objects.get(mac=request.POST['mac'])
     pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
     fr = df.FaceNet()
 
-    average_attention = {}
-
+    average_attention = json.loads(view.average_attention)
     path = fr.path_to_vectors
     list_files = os.listdir(path)
     id_size = len(list_files)
 
-    for i in range(0, id_size):
-        average_attention[i] = []
-
+    full_frame_as_np = np.frombuffer(base64.b64decode(request.POST['full_frame']), dtype=np.uint8)
+    full_frame = cv2.imdecode(full_frame_as_np, flags=1)
     frame_as_np = np.frombuffer(base64.b64decode(request.POST['frame']), dtype=np.uint8)
     frame = cv2.imdecode(frame_as_np, flags=1)
     shape = ast.literal_eval(request.POST['shape'][7:-2])
@@ -111,8 +108,9 @@ def viewer_detected(request):
 
     rep.append(fr.calc_face_descriptor(frame, bb))
 
-    rc.recognition(fr, shape, bb, frame, rep, average_attention, id_size)
-
+    rc.recognition(fr, shape, bb, frame, rep, average_attention, id_size, full_frame)
+    view.average_attention = json.dumps(average_attention)
+    view.save()
     pr.graphics(average_attention)
     pr.save_data(average_attention)
 

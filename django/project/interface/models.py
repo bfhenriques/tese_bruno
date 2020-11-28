@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from jsonfield import JSONField
 
 
 class UserProfile(models.Model):
@@ -92,6 +93,7 @@ class View(models.Model):
     has_changed = models.BooleanField()
     display_time = models.FloatField()
     last_start = models.DateTimeField()
+    average_attention = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name

@@ -171,8 +171,8 @@ def head_pose(im, features):
 def save_data(average_attention):
     save_average = {}
     for i in range(0, len(average_attention)):
-        if len(average_attention[i]) > 0:
-            average = sum(average_attention[i]) / len(average_attention[i])
+        if len(average_attention[str(i)]) > 0:
+            average = sum(average_attention[str(i)]) / len(average_attention[str(i)])
             save_average[i] = average
 
     f = open('interface/digitalsignage/Graphs/data.txt', 'w')
@@ -207,10 +207,14 @@ def graphics(y_values):
     for x, z in y_values.items():
         z_aux = []
         for i in range(len(z)):
-            if z[i] > 50:
-                z_aux.append(1)
-            else:
+            if z[i] <= 25:
                 z_aux.append(0)
+            elif 25 < z[i] <= 50:
+                z_aux.append(1)
+            elif 50 < z[i] <= 75:
+                z_aux.append(2)
+            elif 75 < z[i] <= 100:
+                z_aux.append(3)
 
         if len(z_aux) > 0:
             rand_x = np.arange(0, len(z_aux))

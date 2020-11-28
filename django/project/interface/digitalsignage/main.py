@@ -9,25 +9,27 @@ import sys
 import math
 
 
-def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
+def recognition(fr, shape, bb, frame, rep, average_attention, id_size, full_frame):
 	# Database empty --------------------------------------------------------------------------------------
 	if id_size == 0:
 		aux.new_face_descriptors(fr, rep[0], id_size)
-		average_attention[id_size] = []
+		average_attention[str(id_size)] = []
 
 		if(len(pr.refPt)==2):
-			attention = pr.head_pose(frame, shape)
+			attention = pr.head_pose(full_frame, shape)
 			if math.isnan(attention) == False:
-				average_attention[id_size].append(attention)
+				average_attention[str(id_size)].append(attention)
 				att_text = "Focus: " + str(round(attention)) + "%"
 				att_x = bb[0]-10
 				att_y = bb[3]+20
-				cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+				cv2.putText(full_frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
 		box_text = "New ID " + str(id_size)
 		pos_x = bb[0]-10
 		pos_y = bb[1]-10
-		cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+		cv2.putText(full_frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+
+		pr.store(full_frame, str(id_size))
 
 	elif id_size > 0: 
 		d_values = {}
@@ -41,7 +43,7 @@ def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
 		confidence = d_values[best_comparison]
 
 		print('Prediction: ' + str(best_comparison))
-		print(confidence)
+		print('Confidence:' + str(confidence))
 
 		#The candidate might be in the database
 		if(confidence <= fr.threshold):
@@ -49,36 +51,40 @@ def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
 			box_text = 'ID ' + str(best_comparison)
 			pos_x = bb[0]-10
 			pos_y = bb[1]-10
-			cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+			cv2.putText(full_frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
 			if(len(pr.refPt)==2):
-				attention = pr.head_pose(frame, shape)
+				attention = pr.head_pose(full_frame, shape)
 				if math.isnan(attention) == False:
-					average_attention[best_comparison].append(attention)
+					average_attention[str(best_comparison)].append(attention)
 					att_text = "Focus: " + str(round(attention)) + "%"
-					att_x = bb[0]-10
-					att_y = bb[3]+20
-					cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+					att_x = 0
+					att_y = 40
+					cv2.putText(full_frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.5, (0, 0, 255), thickness=1, lineType=1)
+
+			pr.store(full_frame, str(best_comparison))
 
 
 		#The candidate might not be in the database
 		else:
 			aux.new_face_descriptors(fr, rep[0], id_size)
-			average_attention[id_size] = []
+			average_attention[str(id_size)] = []
 
 			box_text = 'New ID ' + str(id_size)
 			pos_x = bb[0]-10
 			pos_y = bb[1]-10
-			cv2.putText(frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+			cv2.putText(full_frame, box_text, (pos_x, pos_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
 
 			if(len(pr.refPt)==2):
-				attention = pr.head_pose(frame, shape)
+				attention = pr.head_pose(full_frame, shape)
 				if math.isnan(attention) == False:
-					average_attention[id_size].append(attention)
+					average_attention[str(id_size)].append(attention)
 					att_text = "Focus: " + str(round(attention)) + "%"
 					att_x = bb[0]-10
 					att_y = bb[3]+20
-					cv2.putText(frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+					cv2.putText(full_frame, att_text, (att_x, att_y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), thickness=1, lineType=2)
+
+			pr.store(full_frame, str(id_size))
 
 
 '''try:
