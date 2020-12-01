@@ -34,7 +34,7 @@ logger.addHandler(fileHandler)
 logger.propagate = False
 
 # SERVER_URL = 'http://dmmd.ieeta.pt/'
-SERVER_URL = 'http://192.168.1.106/'
+SERVER_URL = 'http://192.168.1.103/'
 
 viewer_flag = Event()
 
@@ -178,7 +178,8 @@ class SharedSpace:
 
         data = {
             'mac': self.mac,
-            'csrfmiddlewaretoken': csrftoken
+            'csrfmiddlewaretoken': csrftoken,
+            'timestamp': int(round(time() * 1000))
         }
 
         response = client.post(SERVER_URL + 'monitor/check_for_changes/', data=data)
@@ -205,7 +206,7 @@ class SharedSpace:
         data = {
             'mac': self.mac,
             'csrfmiddlewaretoken': csrftoken,
-            'start_time': datetime.now(),
+            'start_time': int(round(time() * 1000))
         }
 
         response = client.post(SERVER_URL + 'monitor/view_start/', data=data)
@@ -245,7 +246,7 @@ class SharedSpace:
         data = {
             'mac': self.mac,
             'csrfmiddlewaretoken': csrftoken,
-            'absolute_time': datetime.now(),
+            'absolute_time': int(round(time() * 1000)),
             'relative_time': self.omxp.position(),
             'shape': str(shape),
             'bb': str(bb),
@@ -260,78 +261,6 @@ class SharedSpace:
 
         client.close()
         return True
-
-    '''def viewer_detection_end(self):
-        self.detection_end = self.omxp.position()
-        logger.info('Viewer(s) detection end - {}'.format(self.omxp.position()))
-
-        success = False
-        while not success:
-            try:
-                success = self.report()
-                if not success:
-                    logger.info('Problem reporting. Retrying in 30s...')
-                    sleep(30)
-            except:
-                logger.info('Problem reporting. Retrying in 30s...')
-                sleep(30)
-
-    def report(self):
-        logging.info('Reporting')
-        client = requests.session()
-
-        client.get('%slogin' % SERVER_URL)
-        csrftoken = client.cookies['csrftoken']
-
-        login_data = dict(csrfmiddlewaretoken=csrftoken)
-
-        client.post('%slogin/' % SERVER_URL, data=login_data)
-        csrftoken = client.cookies['csrftoken']
-
-        data = {
-            'mac': self.mac,
-            'csrfmiddlewaretoken': csrftoken,
-            'detection_start': self.detection_start,
-            'detection_end': self.omxp.postion()
-        }
-
-        response = client.post(SERVER_URL + 'monitor/report/', data=data)
-
-        if response.status_code == 404:
-            client.close()
-            return False
-
-        client.close()
-        return True
-
-    def upload_image(self):
-        logging.info('Uploading image')
-        client = requests.session()
-
-        client.get('%slogin' % SERVER_URL)
-        csrftoken = client.cookies['csrftoken']
-
-        login_data = dict(csrfmiddlewaretoken=csrftoken)
-
-        client.post('%slogin/' % SERVER_URL, data=login_data)
-        csrftoken = client.cookies['csrftoken']
-
-        faces = open('./faces.json', 'r').read()
-
-        data = {
-            'mac': self.mac,
-            'faces': faces,
-            'csrfmiddlewaretoken': csrftoken
-        }
-
-        response = client.post(SERVER_URL + 'monitor/image_upload/', data=data)
-
-        if response.status_code == 404:
-            client.close()
-            return False
-
-        client.close()
-        return True'''
 
 
 class CameraThread(Thread):
@@ -354,8 +283,8 @@ class CameraThread(Thread):
 
                 if len(shape) > 0:
                     for i in range(len(bb)):
-                        cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
-                        retval, buffer = cv2.imencode('.jpg', cropped_frame)
+                        # cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
+                        retval, buffer = cv2.imencode('.jpg', frame)
                         frame_as_text = base64.b64encode(buffer)
                         self.shared.viewer_detected(self.shared, frame_as_text, shape, bb[i])
 

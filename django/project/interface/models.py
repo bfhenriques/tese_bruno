@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from jsonfield import JSONField
+import json
 
 
 class UserProfile(models.Model):
@@ -31,6 +31,7 @@ class Content(models.Model):
     video_duration = models.PositiveIntegerField(null=True)
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
+    average_attention = models.CharField(max_length=100)
 
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -47,7 +48,8 @@ class Content(models.Model):
             "file_type": self.file_type,
             "duration": 0 if self.file_type == 'image' else self.video_duration,
             "creator": "None" if self.creator is None else self.creator.username,
-            "permissions": [user.as_dict() for user in self.permissions.all()]
+            "permissions": [user.as_dict() for user in self.permissions.all()],
+            "average_attention": json.loads(self.average_attention)
         }
 
 
@@ -58,6 +60,7 @@ class Timeline(models.Model):
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
     duration = models.PositiveIntegerField()
+    average_attention = models.CharField(max_length=100)
 
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -91,8 +94,9 @@ class View(models.Model):
     configured = models.BooleanField()
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
-    display_time = models.FloatField()
-    last_start = models.DateTimeField()
+    display_time = models.IntegerField()
+    last_start = models.IntegerField()
+    last_check = models.IntegerField()
     average_attention = models.CharField(max_length=100)
 
     def __str__(self):
@@ -118,7 +122,10 @@ class View(models.Model):
             "duration": duration,
             "timelines": timelines,
             "permissions": [user.as_dict() for user in self.permissions.all()],
-            "display_time": self.display_time
+            "display_time": self.display_time,
+            "last_start": self.last_start,
+            "last_check": self.last_check,
+            "average_attention": json.loads(self.average_attention)
         }
 
 

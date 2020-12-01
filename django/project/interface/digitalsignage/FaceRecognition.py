@@ -27,7 +27,8 @@ class FaceNet(object):
 
 	def calc_face_descriptor(self, img, bb):
 		emb_array = np.zeros((1, self.embedding_size))
-		cropped = facenet.flip(img, False)
+		cropped = img[bb[1]:bb[3], bb[0]:bb[2]]
+		cropped = facenet.flip(cropped, False)
 		scaled = cv2.resize(cropped, (self.input_image_size, self.input_image_size), interpolation=cv2.INTER_CUBIC)
 		scaled = facenet.prewhiten(scaled)
 		scaled_reshape = scaled.reshape(-1, self.input_image_size, self.input_image_size, 3)

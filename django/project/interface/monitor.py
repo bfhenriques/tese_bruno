@@ -1,6 +1,6 @@
 from django.utils import timezone
 from django.http import JsonResponse
-from .models import View
+from .models import View, ViewTimelines, Timeline, TimelineContents, Content
 from .scripts import file_manager
 import os
 import threading
@@ -9,6 +9,7 @@ import base64
 import numpy as np
 import json
 import ast
+from datetime import datetime
 from .digitalsignage import FaceRecognition as df
 from .digitalsignage import processing as pr
 from .digitalsignage import main as rc
@@ -55,16 +56,11 @@ def new_monitor(request):
 
 def check_for_changes(request):
     view = View.objects.get(mac=request.POST['mac'])
-    view.display_time = view.display_time + 60
+    timestamp = int(request.POST['timestamp'])
+    last_check = view.last_check
 
-    '''try:
-        info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
-        info_json['display_time'] = info_json['display_time'] + 60
-
-        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
-            json.dump(info_json, outfile, ensure_ascii=False, indent=4)
-    except FileNotFoundError:
-        print('File not found')'''
+    view.display_time = view.display_time + ((timestamp - last_check) // 1000)
+    view.last_check = timestamp
 
     if view.has_changed:
         view.has_changed = False
@@ -81,7 +77,9 @@ def check_for_changes(request):
 
 def view_start(request):
     view = View.objects.get(mac=request.POST['mac'])
-    view.last_start = request.POST['start_time']
+    view.last_start = int(request.POST['start_time'])
+    view.last_check = int(request.POST['start_time'])
+
     view.save()
     return JsonResponse({
         'ack': True
@@ -89,7 +87,21 @@ def view_start(request):
 
 
 def viewer_detected(request):
-    view = View.objects.get(mac=request.POST['mac'])
+    print("1111 - START: " + str(datetime.now()))
+    data = request.POST
+    thread = threading.Thread(target=process_viewer, args=(data, ))
+    thread.daemon = False
+    thread.start()
+    print("1111 - END: " + str(datetime.now()))
+    return JsonResponse({
+        'ack': True
+    })
+
+
+def process_viewer(data):
+    print("2222 - START: " + str(datetime.now()))
+    view = View.objects.get(mac=data['mac'])
+    view_dict = view.as_dict()
     pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
     fr = df.FaceNet()
 
@@ -98,25 +110,73 @@ def viewer_detected(request):
     list_files = os.listdir(path)
     id_size = len(list_files)
 
-    full_frame_as_np = np.frombuffer(base64.b64decode(request.POST['full_frame']), dtype=np.uint8)
-    full_frame = cv2.imdecode(full_frame_as_np, flags=1)
-    frame_as_np = np.frombuffer(base64.b64decode(request.POST['frame']), dtype=np.uint8)
+    frame_as_np = np.frombuffer(base64.b64decode(data['frame']), dtype=np.uint8)
     frame = cv2.imdecode(frame_as_np, flags=1)
-    shape = ast.literal_eval(request.POST['shape'][7:-2])
-    bb = tuple(map(int, request.POST['bb'][1:-1].split(', ')))
+    shape = ast.literal_eval(data['shape'][7:-2])
+    bb = tuple(map(int, data['bb'][1:-1].split(', ')))
     rep = []
 
     rep.append(fr.calc_face_descriptor(frame, bb))
 
-    rc.recognition(fr, shape, bb, frame, rep, average_attention, id_size, full_frame)
+    calculated_attention = rc.recognition(fr, shape, bb, frame, rep, average_attention, id_size)
+
+    relative_time = float(data['relative_time'])
+    for timeline in view_dict['timelines']:
+        if timeline['duration'] < relative_time:
+            relative_time -= timeline['duration']
+            if relative_time < 0:
+                relative_time = 0
+            continue
+
+        db_timeline = Timeline.objects.get(pk=timeline['pk'])
+        timeline_average_attention = json.loads(db_timeline.average_attention)
+        if timeline_average_attention == {}:
+            timeline_average_attention = {calculated_attention['person']: [calculated_attention['value']]}
+        else:
+            if calculated_attention['person'] in timeline_average_attention.keys():
+                timeline_average_attention[calculated_attention['person']].append(calculated_attention['value'])
+            else:
+                timeline_average_attention[calculated_attention['person']] = [calculated_attention['value']]
+
+        db_timeline.average_attention = json.dumps(timeline_average_attention)
+        db_timeline.save()
+
+        break_flag = False
+        for content in timeline['contents']:
+            if content['duration'] < relative_time:
+                relative_time -= content['duration']
+                if relative_time < 0:
+                    relative_time = 0
+                continue
+
+            db_content = Content.objects.get(pk=content['pk'])
+            content_average_attention = json.loads(db_content.average_attention)
+            if content_average_attention == {}:
+                content_average_attention = {calculated_attention['person']: [calculated_attention['value']]}
+            else:
+                if calculated_attention['person'] in content_average_attention.keys():
+                    content_average_attention[calculated_attention['person']].append(calculated_attention['value'])
+                else:
+                    content_average_attention[calculated_attention['person']] = [calculated_attention['value']]
+
+            db_content.average_attention = json.dumps(content_average_attention)
+            db_content.save()
+            break_flag = True
+            break
+
+        if break_flag is True:
+            break
+
     view.average_attention = json.dumps(average_attention)
     view.save()
-    pr.graphics(average_attention)
-    pr.save_data(average_attention)
 
-    return JsonResponse({
+    # pr.graphics(average_attention)
+    # pr.save_data(average_attention)
+
+    print("2222 - END: " + str(datetime.now()))
+    '''return JsonResponse({
         'ack': True
-    })
+    })'''
 
 
 def report(request):
