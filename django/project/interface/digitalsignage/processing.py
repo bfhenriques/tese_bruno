@@ -221,7 +221,7 @@ def graphics(y_values):
             fig = plt.figure()
             plt.ylabel('Focus')
             plt.xlabel('Frames')
-            plt.ylim(-0.5, 1.5)
+            plt.ylim(-0.5, 3.5)
             plt.step(rand_x, z_aux)
             plt.savefig('interface/digitalsignage/Graphs/ID_' + str(x) + '.png')
             plt.close(fig)

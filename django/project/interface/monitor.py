@@ -87,19 +87,17 @@ def view_start(request):
 
 
 def viewer_detected(request):
-    print("1111 - START: " + str(datetime.now()))
     data = request.POST
     thread = threading.Thread(target=process_viewer, args=(data, ))
     thread.daemon = False
     thread.start()
-    print("1111 - END: " + str(datetime.now()))
+
     return JsonResponse({
         'ack': True
     })
 
 
 def process_viewer(data):
-    print("2222 - START: " + str(datetime.now()))
     view = View.objects.get(mac=data['mac'])
     view_dict = view.as_dict()
     pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
@@ -172,11 +170,6 @@ def process_viewer(data):
 
     # pr.graphics(average_attention)
     # pr.save_data(average_attention)
-
-    print("2222 - END: " + str(datetime.now()))
-    '''return JsonResponse({
-        'ack': True
-    })'''
 
 
 def report(request):

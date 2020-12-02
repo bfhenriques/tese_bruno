@@ -31,7 +31,7 @@ class Content(models.Model):
     video_duration = models.PositiveIntegerField(null=True)
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
-    average_attention = models.CharField(max_length=100)
+    average_attention = models.TextField()
 
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -60,7 +60,7 @@ class Timeline(models.Model):
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
     duration = models.PositiveIntegerField()
-    average_attention = models.CharField(max_length=100)
+    average_attention = models.TextField()
 
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -97,7 +97,7 @@ class View(models.Model):
     display_time = models.IntegerField()
     last_start = models.IntegerField()
     last_check = models.IntegerField()
-    average_attention = models.CharField(max_length=100)
+    average_attention = models.TextField()
 
     def __str__(self):
         return self.name
