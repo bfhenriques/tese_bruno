@@ -29,7 +29,7 @@ def new_monitor(request):
         view.display_time = 0.0
         view.has_changed = False
         view.configured = False
-
+        view.average_attention = json.dumps(dict())
         view.save(force_insert=True)
 
         return JsonResponse({
@@ -103,7 +103,6 @@ def process_viewer(data):
     pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
     fr = df.FaceNet()
 
-    average_attention = json.loads(view.average_attention)
     path = fr.path_to_vectors
     list_files = os.listdir(path)
     id_size = len(list_files)
@@ -116,7 +115,7 @@ def process_viewer(data):
 
     rep.append(fr.calc_face_descriptor(frame, bb))
 
-    calculated_attention = rc.recognition(fr, shape, bb, frame, rep, average_attention, id_size)
+    calculated_attention = rc.recognition(fr, shape, bb, frame, rep, id_size)
 
     relative_time = float(data['relative_time'])
     for timeline in view_dict['timelines']:
@@ -164,6 +163,15 @@ def process_viewer(data):
 
         if break_flag is True:
             break
+
+    average_attention = json.loads(view.average_attention)
+    if average_attention == {}:
+        average_attention = {calculated_attention['person']: [calculated_attention['value']]}
+    else:
+        if calculated_attention['person'] in average_attention.keys():
+            average_attention[calculated_attention['person']].append(calculated_attention['value'])
+        else:
+            average_attention[calculated_attention['person']] = [calculated_attention['value']]
 
     view.average_attention = json.dumps(average_attention)
     view.save()

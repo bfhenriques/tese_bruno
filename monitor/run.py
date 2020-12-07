@@ -34,7 +34,7 @@ logger.addHandler(fileHandler)
 logger.propagate = False
 
 # SERVER_URL = 'http://dmmd.ieeta.pt/'
-SERVER_URL = 'http://192.168.1.103/'
+SERVER_URL = 'http://192.168.1.3/'
 
 viewer_flag = Event()
 

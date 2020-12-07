@@ -354,6 +354,7 @@ def add_content(request):
                     content.video_duration = duration
                 if request.user.pk != 1:
                     content.permissions.add(UserProfile.objects.get(user_id=request.user.pk))
+                content.average_attention = json.dumps(dict())
                 content.save()
             else:
                 content.delete()

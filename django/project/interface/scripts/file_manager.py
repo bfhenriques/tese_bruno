@@ -9,6 +9,7 @@ import subprocess
 from ffmpy import FFmpeg
 from ..models import Timeline, View
 from moviepy.editor import VideoFileClip
+import json
 
 logger = logging.getLogger('File Manager Logger')
 ch = logging.StreamHandler()
@@ -212,6 +213,7 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
 
         timeline = Timeline.objects.get(pk=timeline_pk)
         timeline.duration = duration
+        timeline.average_attention = json.dumps(dict())
         timeline.save()
 
 
@@ -333,4 +335,5 @@ def create_view(view_pk, view_resolution, view_configured=False):
     if view_configured:
         view = View.objects.get(pk=view_pk)
         view.has_changed = True
+        view.average_attention = json.dumps(dict())
         view.save()

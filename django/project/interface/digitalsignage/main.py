@@ -9,17 +9,17 @@ import sys
 import math
 
 
-def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
+def recognition(fr, shape, bb, frame, rep, id_size):
 	calculated_attention = {}
 	# Database empty --------------------------------------------------------------------------------------
 	if id_size == 0:
 		aux.new_face_descriptors(fr, rep[0], id_size)
-		average_attention[str(id_size)] = []
+		# average_attention[str(id_size)] = []
 
 		if(len(pr.refPt)==2):
 			attention = pr.head_pose(frame, shape)
 			if math.isnan(attention) == False:
-				average_attention[str(id_size)].append(attention)
+				# average_attention[str(id_size)].append(attention)
 				calculated_attention = {'person': str(id_size),  'value': attention}
 				att_text = "Focus: " + str(round(attention)) + "%"
 				att_x = bb[0]-10
@@ -58,7 +58,7 @@ def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
 			if(len(pr.refPt)==2):
 				attention = pr.head_pose(frame, shape)
 				if math.isnan(attention) == False:
-					average_attention[str(best_comparison)].append(attention)
+					# average_attention[str(best_comparison)].append(attention)
 					calculated_attention = {'person': str(best_comparison), 'value': attention}
 					att_text = "Focus: " + str(round(attention)) + "%"
 					att_x = 0
@@ -71,7 +71,7 @@ def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
 		#The candidate might not be in the database
 		else:
 			aux.new_face_descriptors(fr, rep[0], id_size)
-			average_attention[str(id_size)] = []
+			# average_attention[str(id_size)] = []
 
 			box_text = 'New ID ' + str(id_size)
 			pos_x = bb[0]-10
@@ -81,7 +81,7 @@ def recognition(fr, shape, bb, frame, rep, average_attention, id_size):
 			if(len(pr.refPt)==2):
 				attention = pr.head_pose(frame, shape)
 				if math.isnan(attention) == False:
-					average_attention[str(id_size)].append(attention)
+					# average_attention[str(id_size)].append(attention)
 					calculated_attention = {'person': str(id_size), 'value': attention}
 					att_text = "Focus: " + str(round(attention)) + "%"
 					att_x = bb[0]-10
