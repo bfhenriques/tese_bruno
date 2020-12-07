@@ -14,7 +14,7 @@ from .digitalsignage import FaceRecognition as df
 from .digitalsignage import processing as pr
 from .digitalsignage import main as rc
 
-attention_time_ticker_value = 2
+attention_time_increment = 2
 
 
 def new_monitor(request):
@@ -139,9 +139,9 @@ def process_viewer(data):
 
         db_timeline.average_attention = json.dumps(timeline_average_attention)
         if db_timeline.attention_time is None:
-            db_timeline.attention_time = attention_time_ticker_value
+            db_timeline.attention_time = attention_time_increment
         else:
-            db_timeline.attention_time = db_timeline.attention_time + attention_time_ticker_value
+            db_timeline.attention_time = db_timeline.attention_time + attention_time_increment
         db_timeline.save()
 
         break_flag = False
@@ -163,9 +163,9 @@ def process_viewer(data):
 
             db_content.average_attention = json.dumps(content_average_attention)
             if db_content.attention_time is None:
-                db_content.attention_time = attention_time_ticker_value
+                db_content.attention_time = attention_time_increment
             else:
-                db_content.attention_time = db_content.attention_time + attention_time_ticker_value
+                db_content.attention_time = db_content.attention_time + attention_time_increment
             db_content.save()
             break_flag = True
             break
@@ -190,7 +190,7 @@ def process_viewer(data):
         view.attention_time = view.attention_time + ((int(data['absolute_time']) - view.last_check) // 1000)
         view.last_detection = data['absolute_time']'''
 
-    view.attention_time = view.attention_time + attention_time_ticker_value
+    view.attention_time = view.attention_time + attention_time_increment
     view.display_time = view.display_time + ((int(data['absolute_time']) - view.last_check) // 1000)
     view.last_check = int(data['absolute_time'])
     view.save()
