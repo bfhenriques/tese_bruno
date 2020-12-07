@@ -14,6 +14,8 @@ from .digitalsignage import FaceRecognition as df
 from .digitalsignage import processing as pr
 from .digitalsignage import main as rc
 
+attention_time_ticker_value = 2
+
 
 def new_monitor(request):
     view = View.objects.filter(mac=request.POST['mac'])
@@ -26,7 +28,8 @@ def new_monitor(request):
         view.name = '(new)'
         view.creation_date = timezone.now()
         view.last_modified = timezone.now()
-        view.display_time = 0.0
+        view.display_time = 0
+        view.attention_time = 0
         view.has_changed = False
         view.configured = False
         view.average_attention = json.dumps(dict())
@@ -129,13 +132,16 @@ def process_viewer(data):
         timeline_average_attention = json.loads(db_timeline.average_attention)
         if timeline_average_attention == {}:
             timeline_average_attention = {calculated_attention['person']: [calculated_attention['value']]}
+        elif calculated_attention['person'] in timeline_average_attention.keys():
+            timeline_average_attention[calculated_attention['person']].append(calculated_attention['value'])
         else:
-            if calculated_attention['person'] in timeline_average_attention.keys():
-                timeline_average_attention[calculated_attention['person']].append(calculated_attention['value'])
-            else:
-                timeline_average_attention[calculated_attention['person']] = [calculated_attention['value']]
+            timeline_average_attention[calculated_attention['person']] = [calculated_attention['value']]
 
         db_timeline.average_attention = json.dumps(timeline_average_attention)
+        if db_timeline.attention_time is None:
+            db_timeline.attention_time = attention_time_ticker_value
+        else:
+            db_timeline.attention_time = db_timeline.attention_time + attention_time_ticker_value
         db_timeline.save()
 
         break_flag = False
@@ -150,13 +156,16 @@ def process_viewer(data):
             content_average_attention = json.loads(db_content.average_attention)
             if content_average_attention == {}:
                 content_average_attention = {calculated_attention['person']: [calculated_attention['value']]}
+            elif calculated_attention['person'] in content_average_attention.keys():
+                content_average_attention[calculated_attention['person']].append(calculated_attention['value'])
             else:
-                if calculated_attention['person'] in content_average_attention.keys():
-                    content_average_attention[calculated_attention['person']].append(calculated_attention['value'])
-                else:
-                    content_average_attention[calculated_attention['person']] = [calculated_attention['value']]
+                content_average_attention[calculated_attention['person']] = [calculated_attention['value']]
 
             db_content.average_attention = json.dumps(content_average_attention)
+            if db_content.attention_time is None:
+                db_content.attention_time = attention_time_ticker_value
+            else:
+                db_content.attention_time = db_content.attention_time + attention_time_ticker_value
             db_content.save()
             break_flag = True
             break
@@ -167,66 +176,24 @@ def process_viewer(data):
     average_attention = json.loads(view.average_attention)
     if average_attention == {}:
         average_attention = {calculated_attention['person']: [calculated_attention['value']]}
+    elif calculated_attention['person'] in average_attention.keys():
+        average_attention[calculated_attention['person']].append(calculated_attention['value'])
     else:
-        if calculated_attention['person'] in average_attention.keys():
-            average_attention[calculated_attention['person']].append(calculated_attention['value'])
-        else:
-            average_attention[calculated_attention['person']] = [calculated_attention['value']]
+        average_attention[calculated_attention['person']] = [calculated_attention['value']]
 
     view.average_attention = json.dumps(average_attention)
+
+    '''print(int(data['absolute_time']) - view.last_detection)
+    if view.last_detection is None:
+        view.last_detection = data['absolute_time']
+    elif int(data['absolute_time']) - view.last_detection <= 5000:
+        view.attention_time = view.attention_time + ((int(data['absolute_time']) - view.last_check) // 1000)
+        view.last_detection = data['absolute_time']'''
+
+    view.attention_time = view.attention_time + attention_time_ticker_value
+    view.display_time = view.display_time + ((int(data['absolute_time']) - view.last_check) // 1000)
+    view.last_check = int(data['absolute_time'])
     view.save()
 
     # pr.graphics(average_attention)
     # pr.save_data(average_attention)
-
-
-def report(request):
-    print(request.POST)
-
-    '''view = View.objects.get(mac=request.POST['mac'])
-    viewing_time = request.POST['viewingtime']
-
-    try:
-        info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
-        info_json['viewing_time'] = info_json['viewing_time'] + float(viewing_time)
-
-        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
-            json.dump(info_json, outfile, ensure_ascii=False, indent=4)
-
-    except FileNotFoundError:
-        print('File not found')'''
-
-    return JsonResponse({
-        'ack': True
-    })
-
-
-def image_upload(request):
-    view = View.objects.get(mac=request.POST['mac'])
-    faces = json.loads(request.POST['faces'])
-
-    try:
-        info_json = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
-        if len(info_json['faces']) > 0:
-            for face in faces['faces']:
-                info_json['faces'].append(face)
-        else:
-            info_json['faces'] = faces['faces']
-
-        with open('report-data/' + str(view.pk) + '.json', 'w') as outfile:
-            json.dump(info_json, outfile, ensure_ascii=False, indent=4)
-
-    except FileNotFoundError:
-        print('File not found')
-
-    '''index = 1
-    for face in faces['faces']:
-        image = base64.b64decode(face[2:-1])
-        image_as_np = np.frombuffer(image, dtype=np.uint8)
-        img = cv2.imdecode(image_as_np, flags=1)
-        cv2.imwrite('./face'+str(index)+'.jpg', img)
-        index += 1'''
-
-    return JsonResponse({
-        'ack': True
-    })

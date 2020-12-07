@@ -32,6 +32,7 @@ class Content(models.Model):
     permissions = models.ManyToManyField(UserProfile)
     has_changed = models.BooleanField()
     average_attention = models.TextField()
+    attention_time = models.IntegerField()
 
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -49,7 +50,8 @@ class Content(models.Model):
             "duration": 0 if self.file_type == 'image' else self.video_duration,
             "creator": "None" if self.creator is None else self.creator.username,
             "permissions": [user.as_dict() for user in self.permissions.all()],
-            "average_attention": json.loads(self.average_attention)
+            "average_attention": json.loads(self.average_attention),
+            "attention_time": self.attention_time
         }
 
 
@@ -61,6 +63,7 @@ class Timeline(models.Model):
     has_changed = models.BooleanField()
     duration = models.PositiveIntegerField()
     average_attention = models.TextField()
+    attention_time = models.IntegerField()
 
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
@@ -81,7 +84,9 @@ class Timeline(models.Model):
             "duration": self.duration,
             "contents": contents,
             "creator": "None" if self.creator is None else self.creator.username,
-            "permissions": [user.as_dict() for user in self.permissions.all()]
+            "permissions": [user.as_dict() for user in self.permissions.all()],
+            "average_attention": json.loads(self.average_attention),
+            "attention_time": self.attention_time
         }
 
 
@@ -98,6 +103,8 @@ class View(models.Model):
     last_start = models.IntegerField()
     last_check = models.IntegerField()
     average_attention = models.TextField()
+    attention_time = models.IntegerField()
+    last_detection = models.IntegerField()
 
     def __str__(self):
         return self.name
@@ -125,7 +132,8 @@ class View(models.Model):
             "display_time": self.display_time,
             "last_start": self.last_start,
             "last_check": self.last_check,
-            "average_attention": json.loads(self.average_attention)
+            "average_attention": json.loads(self.average_attention),
+            "attention_time": self.attention_time
         }
 
 
