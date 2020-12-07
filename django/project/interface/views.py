@@ -139,28 +139,31 @@ def edit_view(request, pk):
 
 @login_required
 def info_view(request, pk):
-
     if not get_user_permissions(request.user.pk)['views']:
         return render(request, 'error/access_denied.html')
 
     view = View.objects.get(pk=pk)
-    form = ViewForm(initial={
-        'name': view.name,
-        'resolution': view.resolution,
-        'mac': view.mac
-    })
 
-    info = None
-    try:
-        info = json.loads(open('report-data/' + str(view.pk) + '.json', 'r').read())
-        info['viewing_time_percentage'] = 100 * info['viewing_time'] / info['display_time']
+    average_attention = json.loads(view.average_attention)
+    average_attention_coefficient = 0
+    if len(average_attention.keys()) > 0:
+        entries_count = 0
+        for person in average_attention:
+            entries_count += len(average_attention[person])
+            average_attention_coefficient += sum(average_attention[person])
+        average_attention_coefficient = average_attention_coefficient / entries_count
 
-    except FileNotFoundError:
-        print('File not found')
+    info = {
+        'display_time': view.display_time,
+        'attention_time': view.attention_time,
+        'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
+        'number_of_recognitions': len(average_attention.keys()),
+        'average_attention_coefficient': round(average_attention_coefficient, 2)
+    }
 
-    context = {"form": form,
-               'info': info,
+    context = {'info': info,
                'permission': get_user_permissions(request.user.pk)}
+
     return render(request, 'interface/View/info_view.html', context)
 
 

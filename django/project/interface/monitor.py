@@ -183,13 +183,6 @@ def process_viewer(data):
 
     view.average_attention = json.dumps(average_attention)
 
-    '''print(int(data['absolute_time']) - view.last_detection)
-    if view.last_detection is None:
-        view.last_detection = data['absolute_time']
-    elif int(data['absolute_time']) - view.last_detection <= 5000:
-        view.attention_time = view.attention_time + ((int(data['absolute_time']) - view.last_check) // 1000)
-        view.last_detection = data['absolute_time']'''
-
     view.attention_time = view.attention_time + attention_time_increment
     view.display_time = view.display_time + ((int(data['absolute_time']) - view.last_check) // 1000)
     view.last_check = int(data['absolute_time'])
