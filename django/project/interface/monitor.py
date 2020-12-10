@@ -8,11 +8,7 @@ import cv2
 import base64
 import numpy as np
 import json
-import ast
-from datetime import datetime
-from .digitalsignage import FaceRecognition as df
-from .digitalsignage import processing as pr
-from .digitalsignage import main as rc
+from .digitalsignageimproved import demo
 
 attention_time_increment = 2
 
@@ -101,92 +97,147 @@ def viewer_detected(request):
 
 
 def process_viewer(data):
+    with open('interface/digitalsignageimproved/data.txt') as json_file:
+        ids = json.load(json_file)
+
     view = View.objects.get(mac=data['mac'])
     view_dict = view.as_dict()
-    pr.refPt = (int(view.resolution.split(':')[0]) / 2, int(view.resolution.split(':')[1]) / 2)
-    fr = df.FaceNet()
-
-    path = fr.path_to_vectors
-    list_files = os.listdir(path)
-    id_size = len(list_files)
 
     frame_as_np = np.frombuffer(base64.b64decode(data['frame']), dtype=np.uint8)
     frame = cv2.imdecode(frame_as_np, flags=1)
-    shape = ast.literal_eval(data['shape'][7:-2])
-    bb = tuple(map(int, data['bb'][1:-1].split(', ')))
-    rep = []
+    dims = frame.shape
+    shape, bb, raw_shape = demo.detect_face(frame)
 
-    rep.append(fr.calc_face_descriptor(frame, bb))
+    for i in range(len(bb)):
+        key = demo.face_recognition(frame, raw_shape[i], ids)
+        eulerAngles = demo.head_pose(dims, shape[i])
+        calculated_attention = demo.calculate_attention(ids, key, eulerAngles)
+        # This is the face sent from the raspberry, needs to be converted to grayscale for emotion recognition
+        face = cv2.cvtColor(frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]], cv2.COLOR_BGR2GRAY)
+        emotion = demo.emotion_recognition(face, ids, key)
+        # this function is just for visualization and debugging, should be commented
+        # demo.display(key, bb[i], shape[i], emotion, frame)
+        # cv2.imwrite('interface/digitalsignageimproved/'+key+'.jpg', frame)
 
-    calculated_attention = rc.recognition(fr, shape, bb, frame, rep, id_size)
-
-    relative_time = float(data['relative_time'])
-    for timeline in view_dict['timelines']:
-        if timeline['duration'] < relative_time:
-            relative_time -= timeline['duration']
-            if relative_time < 0:
-                relative_time = 0
-            continue
-
-        db_timeline = Timeline.objects.get(pk=timeline['pk'])
-        timeline_average_attention = json.loads(db_timeline.average_attention)
-        if timeline_average_attention == {}:
-            timeline_average_attention = {calculated_attention['person']: [calculated_attention['value']]}
-        elif calculated_attention['person'] in timeline_average_attention.keys():
-            timeline_average_attention[calculated_attention['person']].append(calculated_attention['value'])
-        else:
-            timeline_average_attention[calculated_attention['person']] = [calculated_attention['value']]
-
-        db_timeline.average_attention = json.dumps(timeline_average_attention)
-        if db_timeline.attention_time is None:
-            db_timeline.attention_time = attention_time_increment
-        else:
-            db_timeline.attention_time = db_timeline.attention_time + attention_time_increment
-        db_timeline.save()
-
-        break_flag = False
-        for content in timeline['contents']:
-            if content['duration'] < relative_time:
-                relative_time -= content['duration']
+        relative_time = float(data['relative_time'])
+        for timeline in view_dict['timelines']:
+            if timeline['duration'] < relative_time:
+                relative_time -= timeline['duration']
                 if relative_time < 0:
                     relative_time = 0
                 continue
 
-            db_content = Content.objects.get(pk=content['pk'])
-            content_average_attention = json.loads(db_content.average_attention)
-            if content_average_attention == {}:
-                content_average_attention = {calculated_attention['person']: [calculated_attention['value']]}
-            elif calculated_attention['person'] in content_average_attention.keys():
-                content_average_attention[calculated_attention['person']].append(calculated_attention['value'])
+            db_timeline = Timeline.objects.get(pk=timeline['pk'])
+            timeline_average_attention = json.loads(db_timeline.average_attention)
+            if timeline_average_attention == {}:
+                timeline_average_attention = new_average_attention(key, calculated_attention, emotion)
+            elif key in timeline_average_attention.keys():
+                timeline_average_attention[key]['average_attention'].append(calculated_attention)
+                timeline_average_attention[key]['cumulative_attention'] += 1
+                timeline_average_attention[key]['emotions'][emotion] += 1
+                timeline_average_attention[key]['frames'] += 1
             else:
-                content_average_attention[calculated_attention['person']] = [calculated_attention['value']]
+                timeline_average_attention[key] = new_average_attention_id(calculated_attention, emotion)
 
-            db_content.average_attention = json.dumps(content_average_attention)
-            if db_content.attention_time is None:
-                db_content.attention_time = attention_time_increment
+            db_timeline.average_attention = json.dumps(timeline_average_attention)
+            if db_timeline.attention_time is None:
+                db_timeline.attention_time = attention_time_increment
             else:
-                db_content.attention_time = db_content.attention_time + attention_time_increment
-            db_content.save()
-            break_flag = True
-            break
+                db_timeline.attention_time = db_timeline.attention_time + attention_time_increment
+            db_timeline.save()
 
-        if break_flag is True:
-            break
+            break_flag = False
+            for content in timeline['contents']:
+                if content['duration'] < relative_time:
+                    relative_time -= content['duration']
+                    if relative_time < 0:
+                        relative_time = 0
+                    continue
 
-    average_attention = json.loads(view.average_attention)
-    if average_attention == {}:
-        average_attention = {calculated_attention['person']: [calculated_attention['value']]}
-    elif calculated_attention['person'] in average_attention.keys():
-        average_attention[calculated_attention['person']].append(calculated_attention['value'])
-    else:
-        average_attention[calculated_attention['person']] = [calculated_attention['value']]
+                db_content = Content.objects.get(pk=content['pk'])
+                content_average_attention = json.loads(db_content.average_attention)
+                if content_average_attention == {}:
+                    content_average_attention = new_average_attention(key, calculated_attention, emotion)
+                elif key in content_average_attention.keys():
+                    content_average_attention[key]['average_attention'].append(calculated_attention)
+                    content_average_attention[key]['cumulative_attention'] += 1
+                    content_average_attention[key]['emotions'][emotion] += 1
+                    content_average_attention[key]['frames'] += 1
+                else:
+                    content_average_attention[key] = new_average_attention_id(calculated_attention, emotion)
 
-    view.average_attention = json.dumps(average_attention)
+                db_content.average_attention = json.dumps(content_average_attention)
+                if db_content.attention_time is None:
+                    db_content.attention_time = attention_time_increment
+                else:
+                    db_content.attention_time = db_content.attention_time + attention_time_increment
+                db_content.save()
+                break_flag = True
+                break
 
-    view.attention_time = view.attention_time + attention_time_increment
-    view.display_time = view.display_time + ((int(data['absolute_time']) - view.last_check) // 1000)
-    view.last_check = int(data['absolute_time'])
-    view.save()
+            if break_flag is True:
+                break
 
-    # pr.graphics(average_attention)
-    # pr.save_data(average_attention)
+        average_attention = json.loads(view.average_attention)
+        if average_attention == {}:
+            average_attention = new_average_attention(key, calculated_attention, emotion)
+        elif key in average_attention.keys():
+            average_attention[key]['average_attention'].append(calculated_attention)
+            average_attention[key]['cumulative_attention'] += 1
+            average_attention[key]['emotions'][emotion] += 1
+            average_attention[key]['frames'] += 1
+        else:
+            average_attention[key] = new_average_attention_id(calculated_attention, emotion)
+
+        view.average_attention = json.dumps(average_attention)
+        view.attention_time = view.attention_time + attention_time_increment
+        view.display_time = view.display_time + ((int(data['absolute_time']) - view.last_check) // 1000)
+        view.last_check = int(data['absolute_time'])
+        view.save()
+
+    with open('interface/digitalsignageimproved/data.txt', 'w') as outfile:
+        json.dump(ids, outfile)
+
+
+def new_average_attention(key, calculated_attention, emotion):
+    emotions = {
+        "Neutral": 0,
+        "Happiness": 0,
+        "Surprise": 0,
+        "Sadness": 0,
+        "Anger": 0,
+        "Disgust": 0,
+        "Fear": 0,
+        "Contempt": 0
+    }
+    emotions[emotion] += 1
+
+    return {
+        key: {
+            'average_attention': [calculated_attention],
+            'cumulative_attention': calculated_attention,
+            'emotions': emotions,
+            'frames': 1
+        }
+    }
+
+
+def new_average_attention_id(calculated_attention, emotion):
+    emotions = {
+        "Neutral": 0,
+        "Happiness": 0,
+        "Surprise": 0,
+        "Sadness": 0,
+        "Anger": 0,
+        "Disgust": 0,
+        "Fear": 0,
+        "Contempt": 0
+    }
+    emotions[emotion] += 1
+
+    return {
+            'average_attention': [calculated_attention],
+            'cumulative_attention': calculated_attention,
+            'emotions': emotions,
+            'frames': 1
+        }

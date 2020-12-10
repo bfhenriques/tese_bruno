@@ -214,6 +214,7 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
         timeline = Timeline.objects.get(pk=timeline_pk)
         timeline.duration = duration
         timeline.average_attention = json.dumps(dict())
+        timeline.attention_time = 0
         timeline.save()
 
 

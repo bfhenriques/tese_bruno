@@ -9,6 +9,8 @@ from .scripts import file_manager
 import json
 import threading
 from django.http import FileResponse
+from .digitalsignageimproved import demo
+import datetime
 
 
 def get_user_permissions(pk):
@@ -143,22 +145,48 @@ def info_view(request, pk):
         return render(request, 'error/access_denied.html')
 
     view = View.objects.get(pk=pk)
+    view_as_dict = view.as_dict()
 
     average_attention = json.loads(view.average_attention)
-    average_attention_coefficient = 0
+    average_attention_value = 0
+    emotions = {
+        "Neutral": 0,
+        "Happiness": 0,
+        "Surprise": 0,
+        "Sadness": 0,
+        "Anger": 0,
+        "Disgust": 0,
+        "Fear": 0,
+        "Contempt": 0
+    }
+    emotions_chart = ''
+    entries_count = 0
     if len(average_attention.keys()) > 0:
         entries_count = 0
         for person in average_attention:
-            entries_count += len(average_attention[person])
-            average_attention_coefficient += sum(average_attention[person])
-        average_attention_coefficient = average_attention_coefficient / entries_count
+            entries_count += len(average_attention[person]['average_attention'])
+            average_attention_value += sum(average_attention[person]['average_attention'])
+            emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
+            emotions['Happiness'] += average_attention[person]['emotions']['Happiness']
+            emotions['Surprise'] += average_attention[person]['emotions']['Surprise']
+            emotions['Sadness'] += average_attention[person]['emotions']['Sadness']
+            emotions['Anger'] += average_attention[person]['emotions']['Anger']
+            emotions['Disgust'] += average_attention[person]['emotions']['Disgust']
+            emotions['Fear'] += average_attention[person]['emotions']['Fear']
+            emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
+
+        average_attention_value = average_attention_value / entries_count
+        emotions_chart = demo.emotions_graphic('View', pk, emotions)
 
     info = {
-        'display_time': view.display_time,
-        'attention_time': view.attention_time,
+        'view': view_as_dict,
+        'display_time': demo.hms(view.display_time),
+        'attention_time': demo.hms(view.attention_time),
         'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
+        'average_attention': round(average_attention_value, 2),
+        'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
-        'average_attention_coefficient': round(average_attention_coefficient, 2)
+        'number_of_frames': entries_count
     }
 
     context = {'info': info,
@@ -301,6 +329,62 @@ def edit_timeline(request, pk):
 
 
 @login_required
+def info_timeline(request, pk):
+    if not get_user_permissions(request.user.pk)['timelines']:
+        return render(request, 'error/access_denied.html')
+
+    timeline = Timeline.objects.get(pk=pk)
+    timeline_as_dict = timeline.as_dict()
+
+    average_attention = json.loads(timeline.average_attention)
+    average_attention_value = 0
+    emotions = {
+        "Neutral": 0,
+        "Happiness": 0,
+        "Surprise": 0,
+        "Sadness": 0,
+        "Anger": 0,
+        "Disgust": 0,
+        "Fear": 0,
+        "Contempt": 0
+    }
+    emotions_chart = ''
+    entries_count = 0
+    if len(average_attention.keys()) > 0:
+        entries_count = 0
+        for person in average_attention:
+            entries_count += len(average_attention[person]['average_attention'])
+            average_attention_value += sum(average_attention[person]['average_attention'])
+            emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
+            emotions['Happiness'] += average_attention[person]['emotions']['Happiness']
+            emotions['Surprise'] += average_attention[person]['emotions']['Surprise']
+            emotions['Sadness'] += average_attention[person]['emotions']['Sadness']
+            emotions['Anger'] += average_attention[person]['emotions']['Anger']
+            emotions['Disgust'] += average_attention[person]['emotions']['Disgust']
+            emotions['Fear'] += average_attention[person]['emotions']['Fear']
+            emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
+
+        average_attention_value = average_attention_value / entries_count
+        emotions_chart = demo.emotions_graphic('Timeline', pk, emotions)
+
+    info = {
+        'timeline': timeline_as_dict,
+        # 'display_time': demo.hms(view.display_time),
+        'attention_time': demo.hms(timeline.attention_time),
+        # 'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
+        'average_attention': round(average_attention_value, 2),
+        'emotions_chart': emotions_chart,
+        'number_of_recognitions': len(average_attention.keys()),
+        'number_of_frames': entries_count
+    }
+
+    context = {'info': info,
+               'permission': get_user_permissions(request.user.pk)}
+
+    return render(request, 'interface/Timeline/info_timeline.html', context)
+
+
+@login_required
 def delete_timeline(request, pk):
     if not get_user_permissions(request.user.pk)['timelines']:
         return render(request, 'error/access_denied.html')
@@ -358,6 +442,7 @@ def add_content(request):
                 if request.user.pk != 1:
                     content.permissions.add(UserProfile.objects.get(user_id=request.user.pk))
                 content.average_attention = json.dumps(dict())
+                content.attention_time = 0
                 content.save()
             else:
                 content.delete()
@@ -417,6 +502,62 @@ def edit_content(request, pk):
 
         return render(request, 'interface/Content/edit_content.html', context)
         # return FileResponse(open(content.path, 'rb'), content_type='application/pdf')
+
+
+@login_required
+def info_content(request, pk):
+    if not get_user_permissions(request.user.pk)['contents']:
+        return render(request, 'error/access_denied.html')
+
+    content = Content.objects.get(pk=pk)
+    content_as_dict = content.as_dict()
+
+    average_attention = json.loads(content.average_attention)
+    average_attention_value = 0
+    emotions = {
+        "Neutral": 0,
+        "Happiness": 0,
+        "Surprise": 0,
+        "Sadness": 0,
+        "Anger": 0,
+        "Disgust": 0,
+        "Fear": 0,
+        "Contempt": 0
+    }
+    emotions_chart = ''
+    entries_count = 0
+    if len(average_attention.keys()) > 0:
+        entries_count = 0
+        for person in average_attention:
+            entries_count += len(average_attention[person]['average_attention'])
+            average_attention_value += sum(average_attention[person]['average_attention'])
+            emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
+            emotions['Happiness'] += average_attention[person]['emotions']['Happiness']
+            emotions['Surprise'] += average_attention[person]['emotions']['Surprise']
+            emotions['Sadness'] += average_attention[person]['emotions']['Sadness']
+            emotions['Anger'] += average_attention[person]['emotions']['Anger']
+            emotions['Disgust'] += average_attention[person]['emotions']['Disgust']
+            emotions['Fear'] += average_attention[person]['emotions']['Fear']
+            emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
+
+        average_attention_value = average_attention_value / entries_count
+        emotions_chart = demo.emotions_graphic('Content', pk, emotions)
+
+    info = {
+        'content': content_as_dict,
+        # 'display_time': demo.hms(view.display_time),
+        'attention_time': demo.hms(content.attention_time),
+        # 'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
+        'average_attention': round(average_attention_value, 2),
+        'emotions_chart': emotions_chart,
+        'number_of_recognitions': len(average_attention.keys()),
+        'number_of_frames': entries_count
+    }
+
+    context = {'info': info,
+               'permission': get_user_permissions(request.user.pk)}
+
+    return render(request, 'interface/Content/info_content.html', context)
 
 
 @login_required

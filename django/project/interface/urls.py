@@ -15,11 +15,13 @@ urlpatterns = [
     path('timelines/', views.timelines, name='view_timelines'),
     path('timelines/add/', views.add_timeline, name='add_timeline'),
     path('timelines/edit/<int:pk>/', views.edit_timeline, name='edit_timeline'),
+    path('timelines/info/<int:pk>/', views.info_timeline, name='info_timeline'),
     path('timelines/delete/<int:pk>/', views.delete_timeline, name='delete_timeline'),
 
     path('contents/', views.contents, name='view_contents'),
     path('contents/add/', views.add_content, name='add_content'),
     path('contents/edit/<int:pk>/', views.edit_content, name='edit_content'),
+    path('contents/info/<int:pk>/', views.info_content, name='info_content'),
     path('contents/delete/<int:pk>/', views.delete_content, name='delete_content'),
     path('contents/preview/<int:pk>/', views.download_content, name='download_content'),
 

@@ -1,0 +1,63 @@
+{% extends "interface/new_header.html" %}
+{% block page_title %}Timeline Info{% endblock %}
+{% block content %}
+    {% load static %}
+    <script src="{% static 'interface/js/views.js' %}"></script>
+    <script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+        <div class="row mb-1">
+            <div class="col-3 text-right pt-1"><strong>Timeline Name:</strong></div>
+            <div class="col-auto"><h2><a href="{% url 'edit_timeline' pk=info.timeline.pk %}">{{info.timeline.name}}</a></h2></div>
+        </div>
+        <div class="row">
+            <div class="col-3 text-right"><strong>Timeline Contents:</strong></div>
+            <div class="col-auto">
+                <ul>
+                {% for content in info.timeline.contents %}
+                    <li>
+                        <h4><a href="{% url 'edit_content' pk=content.pk %}">{{content.name}}</a></h4>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col-3 text-right"><strong>Display Time:</strong></div>
+            <div class="col-auto">{{info.display_time}}</div>
+        </div> -->
+        <div class="row mt-2">
+            <div class="col-3 text-right"><strong>Attention Time:</strong></div>
+            <div class="col-auto">{{info.attention_time}}</div>
+        </div>
+        <!-- <div class="row mt-2">
+            <div class="col-3 text-right"><strong>Attention Time (%):</strong></div>
+            <div class="col-auto">{{info.attention_percentage}}</div>
+        </div> -->
+        <div class="row mt-2">
+            <div class="col-3 text-right"><strong>Average Attention:</strong></div>
+            <div class="col-auto">{{info.average_attention}}</div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-3 text-right"><strong>Number of Recognized People:</strong></div>
+            <div class="col-auto">{{info.number_of_recognitions}}</div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-3 text-right"><strong>Number of Captured Frames:</strong></div>
+            <div class="col-auto">{{info.number_of_frames}}</div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-3 text-right"><strong>Emotions:</strong></div>
+            {% if info.emotions_chart != '' %}
+            <div class="col-auto">
+                <img src="{{info.emotions_chart}}">
+            </div>
+            {% else %}
+            <div class="col-auto">-</div>
+            {% endif %}
+        </div>
+    </main>
+
+{% endblock %}

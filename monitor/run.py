@@ -34,14 +34,14 @@ logger.addHandler(fileHandler)
 logger.propagate = False
 
 # SERVER_URL = 'http://dmmd.ieeta.pt/'
-SERVER_URL = 'http://192.168.1.3/'
+SERVER_URL = 'http://192.168.1.108/'
 
 viewer_flag = Event()
 
 
 class SharedSpace:
     detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+    # predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
     resolution = ''
     mac = ''
     file_path = ''
@@ -50,18 +50,21 @@ class SharedSpace:
     def detect_face(self, image):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         rects = self.detector(gray_image, 1)
-        shape = []
+        # shape = []
         bb = []
+        # raw_shape = []
 
         for (z, rect) in enumerate(rects):
             if rect is not None and rect.top() > 0 and rect.right() < gray_image.shape[1] and rect.bottom() < \
                     gray_image.shape[0] and rect.left() > 0:
-                predicted = self.predictor(gray_image, rect)
-                shape.append(self.shape_to_np(self, predicted))
+                # predicted = self.predictor(gray_image, rect)
+                # print(predicted)
+                # shape.append(self.shape_to_np(self, predicted))
                 (x, y, w, h) = self.rect_to_bb(self, rect)
                 bb.append((x, y, x + w, y + h))
+                # raw_shape.append(predicted)
 
-        return shape, bb
+        return bb
 
     def shape_to_np(self, shape):
         landmarks = np.zeros((68, 2), dtype=int)
@@ -218,20 +221,20 @@ class SharedSpace:
         client.close()
         return True
 
-    def viewer_detected(self, frame, shape, bb):
+    def viewer_detected(self, frame):
         logger.info('Viewer(s) detection start - absolute: {} - relative: {}'.format(time(), self.omxp.position()))
 
         success = False
         while not success:
             try:
-                success = self.report_viewer_detected(self, frame, shape, bb)
+                success = self.report_viewer_detected(self, frame)
                 if not success:
                     logger.info('Problem reporting attention start')
 
             except:
                 logger.info('Problem reporting attention start')
 
-    def report_viewer_detected(self, frame, shape, bb):
+    def report_viewer_detected(self, frame):
         logging.info('Reporting attention start')
         client = requests.session()
 
@@ -248,9 +251,11 @@ class SharedSpace:
             'csrfmiddlewaretoken': csrftoken,
             'absolute_time': int(round(time() * 1000)),
             'relative_time': self.omxp.position(),
-            'shape': str(shape),
-            'bb': str(bb),
-            'frame': frame
+            # 'shape': str(shape),
+            # 'raw_shape': str(raw_shape),
+            # 'bb': str(bb),
+            'frame': frame,
+            # 'dims': str(dims)
         }
 
         response = client.post(SERVER_URL + 'monitor/viewer_detected/', data=data)
@@ -279,14 +284,14 @@ class CameraThread(Thread):
                 frame = np.empty((240, 320, 3), dtype=np.uint8)
                 camera.capture(frame, 'bgr')
 
-                shape, bb = self.shared.detect_face(self.shared, frame)
+                bb = self.shared.detect_face(self.shared, frame)
 
-                if len(shape) > 0:
+                if len(bb) > 0:
                     for i in range(len(bb)):
                         # cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
                         retval, buffer = cv2.imencode('.jpg', frame)
                         frame_as_text = base64.b64encode(buffer)
-                        self.shared.viewer_detected(self.shared, frame_as_text, shape, bb[i])
+                        self.shared.viewer_detected(self.shared, frame_as_text)
 
 
 class MonitorThread(Thread):
