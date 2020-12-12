@@ -10,47 +10,52 @@
 <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
     <div class="card">
         <div class="card-header">
-            <h2><a href="{% url 'edit_view' pk=info.view.pk %}">{{info.view.name}}</a></h2>
+            <div class="float-left"><h2>{{info.view.name}}</h2></div>
+            <div class="float-right"><a class="btn btn-secondary" href="{% url 'edit_view' pk=info.view.pk %}">Edit</a></div>
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-3 text-right"><strong>Timelines:</strong></div>
+                <div class="col-3 text-right"><strong>Timelines</strong></div>
                 <div class="col-auto">
                     <ul>
                     {% for timeline in info.view.timelines %}
                         <li>
-                            <h4><a href="{% url 'edit_timeline' pk=timeline.pk %}">{{timeline.name}}</a></h4>
+                            <h4><a href="{% url 'info_timeline' pk=timeline.pk %}">{{timeline.name}}</a></h4>
                         </li>
                     {% endfor %}
                     </ul>
                 </div>
             </div>
             <div class="row">
-                <div class="col-3 text-right"><strong>Display Time:</strong></div>
+                <div class="col-3 text-right"><strong>Display Time</strong></div>
                 <div class="col-auto">{{info.display_time}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Attention Time:</strong></div>
+                <div class="col-3 text-right"><strong>Attention Time</strong></div>
                 <div class="col-auto">{{info.attention_time}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Attention Time (%):</strong></div>
+                <div class="col-3 text-right"><strong>Attention Time (%)</strong></div>
                 <div class="col-auto">{{info.attention_percentage}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Average Attention:</strong></div>
+                <div class="col-3 text-right"><strong>Average Attention</strong></div>
                 <div class="col-auto">{{info.average_attention}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Number of Recognized People:</strong></div>
+                <div class="col-3 text-right"><strong>Cumulative Attention</strong></div>
+                <div class="col-auto">{{info.cumulative_attention}}</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-3 text-right"><strong>Number of Recognized People</strong></div>
                 <div class="col-auto">{{info.number_of_recognitions}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Number of Captured Frames:</strong></div>
+                <div class="col-3 text-right"><strong>Number of Captured Frames</strong></div>
                 <div class="col-auto">{{info.number_of_frames}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Emotions:</strong></div>
+                <div class="col-3 text-right"><strong>Emotions</strong></div>
                 {% if info.emotions_chart != '' %}
                 <div class="col-auto">
                     <img src="{{info.emotions_chart}}">

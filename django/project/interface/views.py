@@ -151,6 +151,7 @@ def info_view(request, pk):
 
     average_attention = json.loads(view.average_attention)
     average_attention_value = 0
+    cumulative_attention_value = 0.0
     emotions = {
         "Neutral": 0,
         "Happiness": 0,
@@ -167,7 +168,7 @@ def info_view(request, pk):
         entries_count = 0
         for person in average_attention:
             entries_count += len(average_attention[person]['average_attention'])
-            average_attention_value += sum(average_attention[person]['average_attention'])
+            cumulative_attention_value += sum(average_attention[person]['average_attention'])
             emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
             emotions['Happiness'] += average_attention[person]['emotions']['Happiness']
             emotions['Surprise'] += average_attention[person]['emotions']['Surprise']
@@ -177,7 +178,7 @@ def info_view(request, pk):
             emotions['Fear'] += average_attention[person]['emotions']['Fear']
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
-        average_attention_value = average_attention_value / entries_count
+        average_attention_value = cumulative_attention_value / entries_count
         emotions_chart = demo.emotions_graphic('View', pk, emotions)
 
     info = {
@@ -186,6 +187,7 @@ def info_view(request, pk):
         'attention_time': demo.hms(view.attention_time),
         'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
         'average_attention': round(average_attention_value, 2),
+        'cumulative_attention': round(cumulative_attention_value, 2),
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count
@@ -340,6 +342,7 @@ def info_timeline(request, pk):
 
     average_attention = json.loads(timeline.average_attention)
     average_attention_value = 0
+    cumulative_attention_value = 0.0
     emotions = {
         "Neutral": 0,
         "Happiness": 0,
@@ -356,7 +359,7 @@ def info_timeline(request, pk):
         entries_count = 0
         for person in average_attention:
             entries_count += len(average_attention[person]['average_attention'])
-            average_attention_value += sum(average_attention[person]['average_attention'])
+            cumulative_attention_value += sum(average_attention[person]['average_attention'])
             emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
             emotions['Happiness'] += average_attention[person]['emotions']['Happiness']
             emotions['Surprise'] += average_attention[person]['emotions']['Surprise']
@@ -366,7 +369,7 @@ def info_timeline(request, pk):
             emotions['Fear'] += average_attention[person]['emotions']['Fear']
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
-        average_attention_value = average_attention_value / entries_count
+        average_attention_value = cumulative_attention_value / entries_count
         emotions_chart = demo.emotions_graphic('Timeline', pk, emotions)
 
     info = {
@@ -375,6 +378,7 @@ def info_timeline(request, pk):
         'attention_time': demo.hms(timeline.attention_time),
         # 'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
         'average_attention': round(average_attention_value, 2),
+        'cumulative_attention': round(cumulative_attention_value, 2),
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count
@@ -516,6 +520,7 @@ def info_content(request, pk):
 
     average_attention = json.loads(content.average_attention)
     average_attention_value = 0
+    cumulative_attention_value = 0
     emotions = {
         "Neutral": 0,
         "Happiness": 0,
@@ -532,7 +537,7 @@ def info_content(request, pk):
         entries_count = 0
         for person in average_attention:
             entries_count += len(average_attention[person]['average_attention'])
-            average_attention_value += sum(average_attention[person]['average_attention'])
+            cumulative_attention_value += sum(average_attention[person]['average_attention'])
             emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
             emotions['Happiness'] += average_attention[person]['emotions']['Happiness']
             emotions['Surprise'] += average_attention[person]['emotions']['Surprise']
@@ -542,7 +547,7 @@ def info_content(request, pk):
             emotions['Fear'] += average_attention[person]['emotions']['Fear']
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
-        average_attention_value = average_attention_value / entries_count
+        average_attention_value = cumulative_attention_value / entries_count
         emotions_chart = demo.emotions_graphic('Content', pk, emotions)
 
     info = {
@@ -551,6 +556,7 @@ def info_content(request, pk):
         'attention_time': demo.hms(content.attention_time),
         # 'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
         'average_attention': round(average_attention_value, 2),
+        'cumulative_attention': round(cumulative_attention_value, 2),
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count
