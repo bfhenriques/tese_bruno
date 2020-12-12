@@ -647,13 +647,13 @@ def delete_user(request, pk):
     return redirect('view_users')
 
 
+#### PERMISSIONS ####
 @login_required
 def permissions_contents(request, pk):
     if request.user.pk != 1:
         return render(request, 'error/access_denied.html')
 
     if request.method == 'POST':
-
         content = Content.objects.get(pk=pk)
         content.permissions.clear()
 
@@ -676,7 +676,7 @@ def permissions_contents(request, pk):
                 users_list.append(aux_user)
 
         context = {'users_list': users_list,
-                   'content'   : content,
+                   'content': content,
                    'permission': get_user_permissions(request.user.pk),
                    'users_json': json.dumps({"data": users_list})}
         return render(request, 'interface/Permissions/contents.html', context)
@@ -688,7 +688,6 @@ def permissions_timelines(request, pk):
         return render(request, 'error/access_denied.html')
 
     if request.method == 'POST':
-
         timeline = Timeline.objects.get(pk=pk)
         timeline.permissions.clear()
 
@@ -711,7 +710,7 @@ def permissions_timelines(request, pk):
                 users_list.append(aux_user)
 
         context = {'users_list': users_list,
-                   'timeline'   : timeline,
+                   'timeline': timeline,
                    'permission': get_user_permissions(request.user.pk),
                    'users_json': json.dumps({"data": users_list})}
         return render(request, 'interface/Permissions/timelines.html', context)
@@ -746,7 +745,7 @@ def permissions_views(request, pk):
                 users_list.append(aux_user)
 
         context = {'users_list': users_list,
-                   'view'   : view,
+                   'view': view,
                    'permission': get_user_permissions(request.user.pk),
                    'users_json': json.dumps({"data": users_list})}
         return render(request, 'interface/Permissions/views.html', context)

@@ -4,41 +4,69 @@
 {% load static %}
 <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-<main role="main" class="container pt-3">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="col-6 fl">
-            <div class="form-row py-3">
-                <div class="col-12">
-                    <label for="name" class="col-12">Content Name</label>
-                    <input type="text" class="form-control col-8 fl" id="name" name="name" placeholder="Content name"
-                           value="{{ content.name }}" required>
-                    <a href="{% url 'download_content' pk=content.pk %}" class="btn btn-outline-secondary col-offset-1 fr">Download Content</a>
-                </div>
-            </div>
-            <div class="form-row py-3">
-                <div class="col-12">
-                    <label for="file" class="col-12">Upload New File</label>
-                    <div class="files">
-                        <input type="file" class="form-control" id="file" name="file" placeholder="File"
-                               value="empty">
+<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            <div class="card-body px-0 pb-0">
+                {% csrf_token %}
+                <div class="row mx-1">
+                    <div class="col-3 text-right">
+                        Name
+                    </div>
+                    <div class="col-3">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Content name"
+                                   value="{{ content.name }}" required>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{% url 'download_content' pk=content.pk %}" class="btn btn-secondary">Download Content</a>
                     </div>
                 </div>
+                <div class="row mx-1 my-3 text-center">
+                    <div class="col-3 text-right">
+                        <label for="file">Upload New File</label>
+                    </div>
+                    <div class="col-3">
+                        <div class="files">
+                            <input type="file" class="form-control" id="file" name="file" placeholder="File"
+                                   value="empty">
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-6 fl">
+                    <div class="form-row py-3">
+                        <div class="col-12">
+                            <label for="name" class="col-12">Content Name</label>
+                            <input type="text" class="form-control col-8 fl" id="name" name="name" placeholder="Content name"
+                                   value="{{ content.name }}" required>
+                            <a href="{% url 'download_content' pk=content.pk %}" class="btn btn-outline-secondary col-offset-1 fr">Download Content</a>
+                        </div>
+                    </div>
+                    <div class="form-row py-3">
+                        <div class="col-12">
+                            <label for="file" class="col-12">Upload New File</label>
+                            <div class="files">
+                                <input type="file" class="form-control" id="file" name="file" placeholder="File"
+                                       value="empty">
+                            </div>
+                        </div>
 
+                    </div>
+                </div>
+                <div class="col-6 fr div-preview">
+                    <label class="col-12">Content Preview</label>
+                    {% if content.file_type == 'image' %}
+                    <img class="preview" src="{{ BASE_DIR }}/{{ content.path }}"/>
+                    {% elif content.file_type == 'pdf' %}
+                    <div class="container">
+                        <object data="{{ BASE_DIR }}/{{ content.path }}" type="application/pdf" width="100%"></object>
+                    </div>
+                    {% endif %}
+                </div> -->
             </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
-        </div>
-        <div class="col-6 fr div-preview">
-            <!--<label class="col-12">Content Preview</label>
-            {% if content.file_type == 'image' %}
-            <img class="preview" src="{{ BASE_DIR }}/{{ content.path }}"/>
-            {% elif content.file_type == 'pdf' %}
-            <div class="container">
-                <object data="{{ BASE_DIR }}/{{ content.path }}" type="application/pdf" width="100%"></object>
+            <div class="card-footer text-right">
+                <button class="btn btn-secondary" type="submit">Submit</button>
             </div>
-            {% endif %}-->
-        </div>
-    </form>
+        </form>
+    </div>
 </main>
-
 {% endblock %}

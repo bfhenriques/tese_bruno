@@ -1,47 +1,65 @@
 {% extends "interface/new_header.html" %}
 {% block page_title %}Edit View{% endblock %}
 {% block content %}
-    {% load static %}
-    <script src="{% static 'interface/js/views.js' %}"></script>
-    <script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
-    <script>var table_timelines= "{{table_timelines}}";</script>
-    <script>var all_timelines= "{{all_timelines}}";</script>
-    <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
+{% load static %}
+<script src="{% static 'interface/js/views.js' %}"></script>
+<script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+<script>var table_timelines= "{{table_timelines}}";</script>
+<script>var all_timelines= "{{all_timelines}}";</script>
+<link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
-
+<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+    <div class="card">
         <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
+            <div class="card-body px-0 pb-0">
+                {% csrf_token %}
+                <div class="row mx-1">
+                    <div class="col-3 text-right">
+                        {{ form.name.label }}
+                    </div>
+                    <div class="col-3">
+                        {{ form.name }}
+                    </div>
+                </div>
+                <div class="row mx-1 my-3">
+                    <div class="col-3 text-right">
+                        <label for="view_dropdown">Add Timeline</label>
+                    </div>
+                    <div class="col-3">
+                        <select class="form-control" id="view_dropdown" name="view_dropdown">
+                            <option selected value="">Choose...</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <input class="btn btn-secondary" type="button" value="Add" onclick="addTimeline()"/>
+                    </div>
+                </div>
 
-            <label for="view_dropdown"></label>
-            <select id="view_dropdown" name="view_dropdown">
-                <option selected value="">Choose...</option>
-            </select>
-            <input type="button" value="Add" onclick="addTimeline()"/>
-
-            <table class="table table-striped table-sm" id="add_table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Duration</th>
-                    <th>Creator</th>
-                    <th>Contents</th>
-                    <th>Creation date</th>
-                    <th>Last modified</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
-            <input type="hidden" class="form-control" id="timelines" name="timelines" value="">
-
-            <button class="btn btn-primary" type="submit">Submit</button>
+                <div class="table-responsive">
+                    <table class="table" style="border-collapse: collapse;" id="add_table">
+                        <thead class="mdl-color--blue-grey-100">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Duration</th>
+                            <th>Creator</th>
+                            <th>Contents</th>
+                            <th>Creation date</th>
+                            <th>Last modified</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" class="form-control" id="timelines" name="timelines" value="">
+            </div>
+            <div class="card-footer text-right">
+                <button class="btn btn-secondary" type="submit">Submit</button>
+            </div>
         </form>
-    </main>
-
+    </div>
+</main>
 {% endblock %}

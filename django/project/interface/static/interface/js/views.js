@@ -53,17 +53,17 @@ function addTimeline() {
             }
             $(add_table).find('tbody').append('' +
                 '<tr>\n' +
-                '                        <td><input type="hidden" class="form-control" name="pks" value="' + timeline.pk + '"></td>' +
-                '                        <td>' + timeline.name + '</td>\n' +
-                '                        <td>' + timeline.duration + '</td>\n' +
-                '                        <td>' + timeline.creator + '</td>\n' +
-                '                        <td>' + contents + '</td>\n' +
-                '                        <td>' + timeline.creation_date + '</td>\n' +
-                '                        <td>' + timeline.last_modified + '</td>\n' +
-                '                        <td><a class="btn btn-default btn-sm" onclick="deleteTimelineRow(this)">\n' +
-                '                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><svg data-feather="trash-2"></svg>\n' +
-                '                        </a></td>\n' +
-                '                    </tr>');
+                '   <td><input type="hidden" class="form-control" name="pks" value="' + timeline.pk + '"></td>' +
+                '   <td>' + timeline.name + '</td>\n' +
+                '   <td>' + timeline.duration + '</td>\n' +
+                '   <td>' + timeline.creator + '</td>\n' +
+                '   <td>' + contents + '</td>\n' +
+                '   <td>' + timeline.creation_date + '</td>\n' +
+                '   <td>' + timeline.last_modified + '</td>\n' +
+                '   <td><a onclick="deleteTimelineRow(this)" title="Delete">\n' +
+                '       <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>\n' +
+                '   </a></td>\n' +
+                '</tr>');
             feather.replace();
             break;
         }
@@ -94,17 +94,17 @@ function populate() {
         }
         $(add_table).find('tbody').append('' +
                 '<tr>\n' +
-                '                        <td><input type="hidden" class="form-control" name="pks" value="' + timeline.pk + '"></td>' +
-                '                        <td>' + timeline.name + '</td>\n' +
-                '                        <td>' + timeline.duration + '</td>\n' +
-                '                        <td>' + timeline.creator + '</td>\n' +
-                '                        <td>' + contents + '</td>\n' +
-                '                        <td>' + timeline.creation_date + '</td>\n' +
-                '                        <td>' + timeline.last_modified + '</td>\n' +
-                '                        <td><a class="btn btn-default btn-sm" onclick="deleteTimelineRow(this)">\n' +
-                '                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><svg data-feather="trash-2"></svg>\n' +
-                '                        </a></td>\n' +
-                '                    </tr>');
+                '   <td><input type="hidden" class="form-control" name="pks" value="' + timeline.pk + '"></td>' +
+                '   <td>' + timeline.name + '</td>\n' +
+                '   <td>' + timeline.duration + '</td>\n' +
+                '   <td>' + timeline.creator + '</td>\n' +
+                '   <td>' + contents + '</td>\n' +
+                '   <td>' + timeline.creation_date + '</td>\n' +
+                '   <td>' + timeline.last_modified + '</td>\n' +
+                '   <td><a onclick="deleteTimelineRow(this)" title="Delete">\n' +
+                '       <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>\n' +
+                '   </a></td>\n' +
+                '/tr>');
         feather.replace();
     }
     removeOptions(dropdown);

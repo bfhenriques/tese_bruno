@@ -25,7 +25,7 @@ class UserCreateForm(UserCreationForm):
             user.save()
             user_profile = UserProfile(contents=contents, timelines=timelines, views=views, user=user)
             user_profile.save()
-            print (user_profile)
+            print(user_profile)
 
         return user
 
@@ -54,7 +54,7 @@ class ContentForm(forms.ModelForm):
 
 
 class ContentEditForm(forms.ModelForm):
-    name = forms.CharField()
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     file = forms.FileField(required=False)
 
     class Meta:
@@ -63,7 +63,7 @@ class ContentEditForm(forms.ModelForm):
 
 
 class TimelineForm(forms.ModelForm):
-    name = forms.CharField()
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Timeline
@@ -79,7 +79,7 @@ class TimelineForm(forms.ModelForm):
 
 
 class ViewForm(forms.ModelForm):
-    name = forms.CharField()
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = View

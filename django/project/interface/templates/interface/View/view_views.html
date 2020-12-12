@@ -4,82 +4,86 @@
     {% load static %}
     <link href="{% static 'interface/css/view.css' %}" rel="stylesheet">
     <main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
-
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-striped table-condensed" style="border-collapse: collapse;" id="views">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Duration</th>
-                    <th>Resolution</th>
-                    <th>Mac address</th>
-                    <th>Creation date</th>
-                    <th>Last modified</th>
-                    <th>Configured</th>
-                    {% if permission.pk == 1 %}
-                        <th></th>
-                    {% endif %}
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for view in views_list %}
-                    <tr class="accordion-toggle" data-toggle="collapse" data-target="#data{{ view.pk }}">
-                        <td>{{ view.name }}</td>
-                        <td>{{ view.duration }}</td>
-                        <td>{{ view.resolution }}</td>
-                        <td>{{ view.mac }}</td>
-                        <td>{{ view.creation_date }}</td>
-                        <td>{{ view.last_modified }}</td>
-                        {% if view.configured %}
-                            <td>
-                                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">check</i>
-                            </td>
-                        {% else %}
-                            <td>
-                                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">clear</i>
-                            </td>
-                        {% endif %}
-                        {% if permission.pk == 1 %}
-                            <td><a href="{% url 'permissions_views' pk=view.pk %}" title="lock">
-                                <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">lock</i>
-                            </a></td>
-                        {% endif %}
-                        <td><a href="{% url 'edit_view' pk=view.pk %}" title="edit">
-                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">edit</i>
-                        </a></td>
-                        <td><a href="{% url 'info_view' pk=view.pk %}" title="info">
-                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">info</i>
-                        </a></td>
-                        <td><a href="{% url 'delete_view' pk=view.pk %}" title="delete">
-                            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>
-                        </a></td>
-                    </tr>
-                    <tr>
-                        <td colspan="8" class="hiddenRow">
-                            <div class="accordion-body collapse" id="data{{ view.pk }}">
-                                <table class="table table-sm">
-                                    <tbody>
-                                    {% for timeline in view.timelines %}
-                                        <tr>
-                                            <td></td>
-                                            <td>{{ timeline.name }}</td>
-                                            <td>{{ timeline.duration }} s</td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table" style="border-collapse: collapse;" id="views">
+                        <thead class="mdl-color--blue-grey-100">
+                            <tr>
+                                <th>Name</th>
+                                <th>Duration</th>
+                                <th>Resolution</th>
+                                <th>Mac address</th>
+                                <th>Creation date</th>
+                                <th>Last modified</th>
+                                <th>Configured</th>
+                                {% if permission.pk == 1 %}
+                                    <th></th>
+                                {% endif %}
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                        <tbody>
+                        {% for view in views_list %}
+                            <tr class="accordion-toggle" data-toggle="collapse" data-target="#data{{ view.pk }}">
+                                <td>{{ view.name }}</td>
+                                <td>{{ view.duration }}</td>
+                                <td>{{ view.resolution }}</td>
+                                <td>{{ view.mac }}</td>
+                                <td>{{ view.creation_date }}</td>
+                                <td>{{ view.last_modified }}</td>
+                                {% if view.configured %}
+                                    <td>
+                                        <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">check</i>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">clear</i>
+                                    </td>
+                                {% endif %}
+                                {% if permission.pk == 1 %}
+                                    <td><a href="{% url 'permissions_views' pk=view.pk %}" title="Lock">
+                                        <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">lock</i>
+                                    </a></td>
+                                {% endif %}
+                                <td><a href="{% url 'edit_view' pk=view.pk %}" title="Edit">
+                                    <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">edit</i>
+                                </a></td>
+                                <td><a href="{% url 'info_view' pk=view.pk %}" title="Info">
+                                    <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">info</i>
+                                </a></td>
+                                <td><a href="{% url 'delete_view' pk=view.pk %}" title="Delete">
+                                    <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>
+                                </a></td>
+                            </tr>
+                            <tr>
+                                {% if permission.pk == 1 %}
+                                    <td colspan="11" class="hiddenRow" style="border-top: none;">
+                                {% else %}
+                                    <td colspan="10" class="hiddenRow" style="border-top: none;">
+                                {% endif%}
+                                    <div class="accordion-body collapse" id="data{{ view.pk }}">
+                                        <table class="table table-sm">
+                                            <tbody>
+                                            {% for timeline in view.timelines %}
+                                                <tr>
+                                                    <td></td>
+                                                    <td>{{ timeline.name }}</td>
+                                                    <td>{{ timeline.duration }} s</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 

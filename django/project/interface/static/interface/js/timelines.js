@@ -74,9 +74,9 @@ function addContent() {
                 '                        <td>' + content.creation_date + '</td>\n' +
                 '                        <td>' + content.last_modified + '</td>\n' +
                 duration_col +
-                '                        <td><a class="btn btn-default btn-sm" onclick="deleteContentRow(this)">\n' +
-                '                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><svg data-feather="trash-2"></svg>\n' +
-                '                        </a></td>\n' +
+                '                        <td><a onclick="deleteContentRow(this) title="Delete">\n' +
+                '                           <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>\n' +
+                '                         </a></td>\n' +
                 '                    </tr>');
             feather.replace();
             break;
@@ -117,9 +117,9 @@ function populate() {
             '                        <td>' + content.creation_date + '</td>\n' +
             '                        <td>' + content.last_modified + '</td>\n' +
             duration_col +
-            '                        <td><a class="btn btn-default btn-sm" onclick="deleteContentRow(this)">\n' +
-            '                          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><svg data-feather="trash-2"></svg>\n' +
-            '                        </a></td>\n' +
+            '                        <td><a onclick="deleteContentRow(this) title="Delete">\n' +
+                '                           <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>\n' +
+                '                         </a></td>\n' +
             '                    </tr>');
         feather.replace();
     }
