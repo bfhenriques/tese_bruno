@@ -80,8 +80,9 @@ class TimelineForm(forms.ModelForm):
 
 class ViewForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    recognition_confidence = forms.FloatField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = View
-        fields = ('name', )
+        fields = ('name', 'recognition_confidence')
         exclude = {'creation_date', 'last_modified', 'duration', 'resolution', 'mac'}

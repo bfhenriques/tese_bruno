@@ -15,7 +15,7 @@ import datetime
 
 def get_user_permissions(pk):
     if pk == 1:
-        return {'pk': 1, 'contents': True, 'timelines': True, 'views': True, 'users': True}
+        return {'pk': 1, 'contents': True, 'timelines': True, 'views': True, 'users': True, 'rec_conf': True}
     else:
         return UserProfile.objects.get(user_id=pk).as_dict()
 
@@ -96,6 +96,7 @@ def edit_view(request, pk):
     if request.method == "POST":
         view = View.objects.get(pk=pk)
         form = ViewForm(request.POST, instance=view)
+        print(form)
         if form.is_valid():
             print(form.cleaned_data)
             post = form.save(commit=False)
@@ -122,6 +123,7 @@ def edit_view(request, pk):
         view = View.objects.get(pk=pk)
         form = ViewForm(initial={
             'name': view.name,
+            'recognition_confidence': view.recognition_confidence,
             'resolution': view.resolution,
             'mac': view.mac
         })

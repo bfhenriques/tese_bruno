@@ -22,6 +22,16 @@
                         {{ form.name }}
                     </div>
                 </div>
+                {% if permission.pk == 1 %}
+                <div class="row mx-1 mt-3">
+                    <div class="col-3 text-right">
+                        {{ form.recognition_confidence.label }}
+                    </div>
+                    <div class="col-3">
+                        {{ form.recognition_confidence }}
+                    </div>
+                </div>
+                {% endif %}
                 <div class="row mx-1 my-3">
                     <div class="col-3 text-right">
                         <label for="view_dropdown">Add Timeline</label>

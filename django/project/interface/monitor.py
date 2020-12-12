@@ -29,6 +29,7 @@ def new_monitor(request):
         view.has_changed = False
         view.configured = False
         view.average_attention = json.dumps(dict())
+        view.recognition_confidence = 0.5
         view.save(force_insert=True)
 
         return JsonResponse({
@@ -109,15 +110,15 @@ def process_viewer(data):
     shape, bb, raw_shape = demo.detect_face(frame)
 
     for i in range(len(bb)):
-        key = demo.face_recognition(frame, raw_shape[i], ids)
+        key = demo.face_recognition(frame, raw_shape[i], ids, view.recognition_confidence)
         eulerAngles = demo.head_pose(dims, shape[i])
         calculated_attention = demo.calculate_attention(ids, key, eulerAngles)
         # This is the face sent from the raspberry, needs to be converted to grayscale for emotion recognition
         face = cv2.cvtColor(frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]], cv2.COLOR_BGR2GRAY)
         emotion = demo.emotion_recognition(face, ids, key)
         # this function is just for visualization and debugging, should be commented
-        # demo.display(key, bb[i], shape[i], emotion, frame)
-        # cv2.imwrite('interface/digitalsignageimproved/'+key+'.jpg', frame)
+        demo.display(key, bb[i], shape[i], emotion, frame)
+        cv2.imwrite('interface/digitalsignageimproved/'+key+'.jpg', frame)
 
         relative_time = float(data['relative_time'])
         for timeline in view_dict['timelines']:

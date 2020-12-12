@@ -9,29 +9,24 @@
 
 <form method="post">
     {% csrf_token %}
-
-    <div class="container">
+    <div class="container" style="width: 100%;">
         <div class="row">
-            <div class="col-md-offset-5 col-md-3">
-                <div class="form-login">
+            <div class="col-md-4 col"></div>
+            <div class="col-md-4 col">
+                <div class="form-login text-center">
                     <h4>Welcome!</h4>
-                    <input type="text" class="form-control input-sm chat-input" placeholder="username"
+                    <input type="text" class="form-control chat-input" placeholder="username"
                            name="username"/>
                     </br>
-                    <input type="password" class="form-control input-sm chat-input"
+                    <input type="password" class="form-control chat-input"
                            placeholder="password" name="password"/>
                     </br>
-                    <div class="wrapper">
-            <span class="group-btn">
-                <button type="submit" class="btn btn-primary btn-md">login <i class="fa fa-sign-in"></i></button>
-            </span>
-                    </div>
+                    <button type="submit" class="btn btn-primary">login <i class="fa fa-sign-in"></i></button>
                 </div>
-
             </div>
+            <div class="col-md-4 col"></div>
         </div>
     </div>
-
 </form>
 
 

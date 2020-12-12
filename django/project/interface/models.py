@@ -105,6 +105,7 @@ class View(models.Model):
     average_attention = models.TextField()
     attention_time = models.IntegerField()
     last_detection = models.IntegerField()
+    recognition_confidence = models.FloatField()
 
     def __str__(self):
         return self.name
@@ -133,7 +134,8 @@ class View(models.Model):
             "last_start": self.last_start,
             "last_check": self.last_check,
             "average_attention": json.loads(self.average_attention),
-            "attention_time": self.attention_time
+            "attention_time": self.attention_time,
+            "recognition_confidence": self.recognition_confidence
         }
 
 

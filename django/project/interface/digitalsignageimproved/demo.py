@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import base64
 
 # Confidence threshold for Face Recognition
-RECOGNITION_CONFIDENCE = 0.6
+RECOGNITION_CONFIDENCE = 0.5
 
 # Maximum angle of face rotation for estimating attention since dlib can't keep detecting the face after a certain point 
 MAX_ANGLE = 30
@@ -65,6 +65,7 @@ def detect_face(image):
 
 	return shape, bb, raw_shape
 
+
 # Initializes a new dictionary for each ID
 def init_dict(ids, key, candidate_descriptor):
 	ids[key] = {}
@@ -75,9 +76,10 @@ def init_dict(ids, key, candidate_descriptor):
 		ids[key]['Emotions'][EMOTION_CLASSES[i]] = 0
 	ids[key]['Frames'] = 1
 
+
 # Face Recognition
 # Stores descriptors to a dictionary everytime a new person appears 
-def face_recognition(frame, shape, ids):
+def face_recognition(frame, shape, ids, recognition_confidence):
 	candidate = dlib.get_face_chip(frame, shape)   
 	candidate = facerec.compute_face_descriptor(candidate)
 	candidate_descriptor = np.asarray(candidate)
@@ -96,10 +98,12 @@ def face_recognition(frame, shape, ids):
 		best_comparison = min(d_values, key=d_values.get)
 		confidence = d_values[best_comparison]
 
-		if confidence < RECOGNITION_CONFIDENCE:
+		if confidence < recognition_confidence:
+			print("11111111")
 			ids[best_comparison]['Frames'] += 1
 			return best_comparison
 		else:
+			print("22222222")
 			init_dict(ids, person, candidate_descriptor.tolist())
 			return person
 
@@ -237,6 +241,7 @@ def hms(seconds):
 	m = seconds % 3600 // 60
 	s = seconds % 3600 % 60
 	return '{:02d}d {:02d}h {:02d}m {:02d}s'.format(d, h, m, s)
+
 
 '''def main():
 	# load models
