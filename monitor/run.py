@@ -41,7 +41,6 @@ viewer_flag = Event()
 
 class SharedSpace:
     detector = dlib.get_frontal_face_detector()
-    # predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
     resolution = ''
     mac = ''
     file_path = ''
@@ -50,19 +49,13 @@ class SharedSpace:
     def detect_face(self, image):
         gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         rects = self.detector(gray_image, 1)
-        # shape = []
         bb = []
-        # raw_shape = []
 
         for (z, rect) in enumerate(rects):
             if rect is not None and rect.top() > 0 and rect.right() < gray_image.shape[1] and rect.bottom() < \
                     gray_image.shape[0] and rect.left() > 0:
-                # predicted = self.predictor(gray_image, rect)
-                # print(predicted)
-                # shape.append(self.shape_to_np(self, predicted))
                 (x, y, w, h) = self.rect_to_bb(self, rect)
                 bb.append((x, y, x + w, y + h))
-                # raw_shape.append(predicted)
 
         return bb
 
@@ -251,11 +244,7 @@ class SharedSpace:
             'csrfmiddlewaretoken': csrftoken,
             'absolute_time': int(round(time() * 1000)),
             'relative_time': self.omxp.position(),
-            # 'shape': str(shape),
-            # 'raw_shape': str(raw_shape),
-            # 'bb': str(bb),
-            'frame': frame,
-            # 'dims': str(dims)
+            'frame': frame
         }
 
         response = client.post(SERVER_URL + 'monitor/viewer_detected/', data=data)

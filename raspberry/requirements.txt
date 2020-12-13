@@ -7,3 +7,4 @@ opencv-python==4.4.0.42
 python-spicy==0.18.1-2
 libatlas-base-dev==3.10.3-1+rpi1
 omxplayer-wrapper
+dlib
