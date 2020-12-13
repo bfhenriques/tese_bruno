@@ -9,29 +9,29 @@
 <script>var table_contents = "{{table_contents}}";</script>
 <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+<main role="main" class="col-12 pt-3 px-4">
     <div class="card">
         <form method="post">
             <div class="card-body px-0 pb-0">
         {% csrf_token %}
                 <div class="row mx-1">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         {{ form.name.label }}
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         {{ form.name }}
                     </div>
                 </div>
                 <div class="row mx-1 my-3">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         <label for="timeline_dropdown">Add Content</label>
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         <select class="form-control" id="timeline_dropdown" name="timeline_dropdown">
                             <option selected value="">Choose...</option>
                         </select>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-md-auto">
                         <input class="btn btn-secondary" type="button" value="Add" onclick="addContent()"/>
                     </div>
                 </div>

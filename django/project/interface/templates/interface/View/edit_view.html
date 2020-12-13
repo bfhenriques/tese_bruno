@@ -9,39 +9,39 @@
 <script>var all_timelines= "{{all_timelines}}";</script>
 <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+<main role="main" class="col-12 pt-3 px-4">
     <div class="card">
         <form method="post">
             <div class="card-body px-0 pb-0">
                 {% csrf_token %}
                 <div class="row mx-1">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         {{ form.name.label }}
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         {{ form.name }}
                     </div>
                 </div>
                 {% if permission.pk == 1 %}
                 <div class="row mx-1 mt-3">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         {{ form.recognition_confidence.label }}
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         {{ form.recognition_confidence }}
                     </div>
                 </div>
                 {% endif %}
                 <div class="row mx-1 my-3">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         <label for="view_dropdown">Add Timeline</label>
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         <select class="form-control" id="view_dropdown" name="view_dropdown">
                             <option selected value="">Choose...</option>
                         </select>
                     </div>
-                    <div class="col-auto">
+                    <div class="col-md-auto">
                         <input class="btn btn-secondary" type="button" value="Add" onclick="addTimeline()"/>
                     </div>
                 </div>

@@ -101,3 +101,9 @@ tr td:first-child:before
 .custom-select {
     width: 50% !important;
 }
+
+@media only screen and (max-width: 768px) {
+  chart-overflow {
+    overflow-x: scroll;
+  }
+}

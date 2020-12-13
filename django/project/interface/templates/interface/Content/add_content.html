@@ -7,25 +7,25 @@
 <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
 <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+<main role="main" class="col-12 pt-3 px-4">
     <div class="card">
         <form method="post" enctype="multipart/form-data">
             <div class="card-body px-0 pb-0">
                 {% csrf_token %}
                 <div class="row mx-1">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         Name
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         <input type="text" class="form-control" id="name" name="name" placeholder="Content name"
                                    value="{{ content.name }}" required>
                     </div>
                 </div>
                 <div class="row mx-1 my-3 text-center">
-                    <div class="col-3 text-right">
+                    <div class="col-md-3 text-md-right">
                         <label for="file">Upload File</label>
                     </div>
-                    <div class="col-3">
+                    <div class="col-md-3">
                         <div class="files">
                             <input type="file" class="form-control" id="file" name="file" placeholder="File"
                                    value="empty">

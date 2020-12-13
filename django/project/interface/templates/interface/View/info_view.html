@@ -2,12 +2,11 @@
 {% block page_title %}View Info{% endblock %}
 {% block content %}
 {% load static %}
-<script src="{% static 'interface/js/views.js' %}"></script>
 <script src="{% static 'interface/js/jquery-3.3.1.min.js' %}"></script>
 <script src="{% static 'interface/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
 <link href="{% static 'interface/css/my.css' %}" rel="stylesheet">
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-12 pt-3 px-4">
+<main role="main" class="col-12 pt-3 px-4">
     <div class="card">
         <div class="card-header">
             <div class="float-left"><h2>{{info.view.name}}</h2></div>
@@ -15,8 +14,8 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-3 text-right"><strong>Timelines</strong></div>
-                <div class="col-auto">
+                <div class="col-md-3 text-md-right"><strong>Timelines</strong></div>
+                <div class="col-md-auto">
                     <ul>
                     {% for timeline in info.view.timelines %}
                         <li>
@@ -27,41 +26,51 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-3 text-right"><strong>Display Time</strong></div>
-                <div class="col-auto">{{info.display_time}}</div>
+                <div class="col-md-3 text-md-right"><strong>Display Time</strong></div>
+                <div class="col-md-auto">{{info.display_time}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Attention Time</strong></div>
-                <div class="col-auto">{{info.attention_time}}</div>
+                <div class="col-md-3 text-md-right"><strong>Attention Time</strong></div>
+                <div class="col-md-auto">{{info.attention_time}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Attention Time (%)</strong></div>
-                <div class="col-auto">{{info.attention_percentage}}</div>
+                <div class="col-md-3 text-md-right"><strong>Attention Time (%)</strong></div>
+                <div class="col-md-auto">{{info.attention_percentage}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Average Attention</strong></div>
-                <div class="col-auto">{{info.average_attention}}</div>
+                <div class="col-md-3 text-md-right"><strong>Average Attention</strong></div>
+                <div class="col-md-auto">{{info.average_attention}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Cumulative Attention</strong></div>
-                <div class="col-auto">{{info.cumulative_attention}}</div>
+                <div class="col-md-3 text-md-right"><strong>Cumulative Attention</strong></div>
+                <div class="col-md-auto">{{info.cumulative_attention}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Number of Recognized People</strong></div>
-                <div class="col-auto">{{info.number_of_recognitions}}</div>
+                <div class="col-md-3 text-md-right"><strong>Number of Recognized People</strong></div>
+                <div class="col-md-auto">{{info.number_of_recognitions}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Number of Captured Frames</strong></div>
-                <div class="col-auto">{{info.number_of_frames}}</div>
+                <div class="col-md-3 text-md-right"><strong>Number of Captured Frames</strong></div>
+                <div class="col-md-auto">{{info.number_of_frames}}</div>
             </div>
             <div class="row mt-2">
-                <div class="col-3 text-right"><strong>Emotions</strong></div>
+                <div class="col-md-3 text-md-right"></div>
+                {% if info.attention_chart != '' %}
+                <div class="col-md-auto chart-overflow">
+                    <img src="{{info.attention_chart}}">
+                </div>
+                {% else %}
+                <div class="col-md-auto">-</div>
+                {% endif %}
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3 text-md-right"></div>
                 {% if info.emotions_chart != '' %}
-                <div class="col-auto">
+                <div class="col-md-auto chart-overflow">
                     <img src="{{info.emotions_chart}}">
                 </div>
                 {% else %}
-                <div class="col-auto">-</div>
+                <div class="col-md-auto">-md-</div>
                 {% endif %}
             </div>
         </div>

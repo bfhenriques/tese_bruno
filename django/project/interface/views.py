@@ -150,6 +150,7 @@ def info_view(request, pk):
     view_as_dict = view.as_dict()
 
     average_attention = json.loads(view.average_attention)
+    attention_values = []
     average_attention_value = 0
     cumulative_attention_value = 0.0
     emotions = {
@@ -162,11 +163,13 @@ def info_view(request, pk):
         "Fear": 0,
         "Contempt": 0
     }
+    attention_chart = ''
     emotions_chart = ''
     entries_count = 0
     if len(average_attention.keys()) > 0:
         entries_count = 0
         for person in average_attention:
+            attention_values += average_attention[person]['average_attention']
             entries_count += len(average_attention[person]['average_attention'])
             cumulative_attention_value += sum(average_attention[person]['average_attention'])
             emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
@@ -179,6 +182,7 @@ def info_view(request, pk):
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
         average_attention_value = cumulative_attention_value / entries_count
+        attention_chart = demo.attention_graphic('View', pk, attention_values)
         emotions_chart = demo.emotions_graphic('View', pk, emotions)
 
     info = {
@@ -188,6 +192,7 @@ def info_view(request, pk):
         'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
         'average_attention': round(average_attention_value, 2),
         'cumulative_attention': round(cumulative_attention_value, 2),
+        'attention_chart': attention_chart,
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count
@@ -341,6 +346,7 @@ def info_timeline(request, pk):
     timeline_as_dict = timeline.as_dict()
 
     average_attention = json.loads(timeline.average_attention)
+    attention_values = []
     average_attention_value = 0
     cumulative_attention_value = 0.0
     emotions = {
@@ -353,11 +359,13 @@ def info_timeline(request, pk):
         "Fear": 0,
         "Contempt": 0
     }
+    attention_chart = ''
     emotions_chart = ''
     entries_count = 0
     if len(average_attention.keys()) > 0:
         entries_count = 0
         for person in average_attention:
+            attention_values += average_attention[person]['average_attention']
             entries_count += len(average_attention[person]['average_attention'])
             cumulative_attention_value += sum(average_attention[person]['average_attention'])
             emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
@@ -370,6 +378,7 @@ def info_timeline(request, pk):
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
         average_attention_value = cumulative_attention_value / entries_count
+        attention_chart = demo.attention_graphic('Timeline', pk, attention_values)
         emotions_chart = demo.emotions_graphic('Timeline', pk, emotions)
 
     info = {
@@ -379,6 +388,7 @@ def info_timeline(request, pk):
         # 'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
         'average_attention': round(average_attention_value, 2),
         'cumulative_attention': round(cumulative_attention_value, 2),
+        'attention_chart': attention_chart,
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count
@@ -519,6 +529,7 @@ def info_content(request, pk):
     content_as_dict = content.as_dict()
 
     average_attention = json.loads(content.average_attention)
+    attention_values = []
     average_attention_value = 0
     cumulative_attention_value = 0
     emotions = {
@@ -531,11 +542,13 @@ def info_content(request, pk):
         "Fear": 0,
         "Contempt": 0
     }
+    attention_chart = ''
     emotions_chart = ''
     entries_count = 0
     if len(average_attention.keys()) > 0:
         entries_count = 0
         for person in average_attention:
+            attention_values += average_attention[person]['average_attention']
             entries_count += len(average_attention[person]['average_attention'])
             cumulative_attention_value += sum(average_attention[person]['average_attention'])
             emotions['Neutral'] += average_attention[person]['emotions']['Neutral']
@@ -548,6 +561,7 @@ def info_content(request, pk):
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
         average_attention_value = cumulative_attention_value / entries_count
+        attention_chart = demo.attention_graphic('Content', pk, attention_values)
         emotions_chart = demo.emotions_graphic('Content', pk, emotions)
 
     info = {
@@ -557,6 +571,7 @@ def info_content(request, pk):
         # 'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
         'average_attention': round(average_attention_value, 2),
         'cumulative_attention': round(cumulative_attention_value, 2),
+        'attention_chart': attention_chart,
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count

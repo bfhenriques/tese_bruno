@@ -206,6 +206,20 @@ def save_data(ids):
 		json.dump(save_dict, file,  indent=4)
 
 
+def attention_graphic(model_type, pk, attention_values):
+	plt.figure(figsize=(6, 4))
+	plt.title('Attention by frames')
+	plt.plot(attention_values)
+	plt.xlabel('Frame')
+	plt.ylabel('Attention')
+	plt.savefig('interface/digitalsignageimproved/graphs/' + model_type + '_Attention_' + str(pk) + '.png')
+
+	with open('interface/digitalsignageimproved/graphs/' + model_type + '_Attention_' + str(pk) + '.png', "rb") as chart:
+		chart_as_text = base64.b64encode(chart.read())
+
+	return 'data:image/png;base64,' + chart_as_text.decode('utf-8')
+
+
 def emotions_graphic(model_type, pk, emotions):
 	fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
@@ -216,15 +230,13 @@ def emotions_graphic(model_type, pk, emotions):
 		legend.append(str(emotions[emotion]) + ' - ' + emotion)
 
 	wedges, texts, autotexts = ax.pie(data, autopct=lambda pct: func(pct, data), textprops=dict(color="w"))
-	ax.legend(wedges, legend, title="Emotions by frames", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-	# plt.setp(autotexts, size=8, weight="bold")
+	ax.legend(wedges, legend, loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
 
-	# ax.set_title("")
-
-	plt.savefig('interface/digitalsignageimproved/' + model_type + '_' + str(pk) + '.png')
+	plt.title('Emotions by frames')
+	plt.savefig('interface/digitalsignageimproved/graphs/' + model_type + '_Emotions_' + str(pk) + '.png')
 	plt.close(fig)
 
-	with open('interface/digitalsignageimproved/' + model_type + '_' + str(pk) + '.png', "rb") as chart:
+	with open('interface/digitalsignageimproved/graphs/' + model_type + '_Emotions_' + str(pk) + '.png', "rb") as chart:
 		chart_as_text = base64.b64encode(chart.read())
 
 	return 'data:image/png;base64,' + chart_as_text.decode('utf-8')
