@@ -96,9 +96,7 @@ def edit_view(request, pk):
     if request.method == "POST":
         view = View.objects.get(pk=pk)
         form = ViewForm(request.POST, instance=view)
-        print(form)
         if form.is_valid():
-            print(form.cleaned_data)
             post = form.save(commit=False)
             post.last_modified = timezone.now()
             post.has_changed = False

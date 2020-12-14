@@ -99,11 +99,9 @@ def face_recognition(frame, shape, ids, recognition_confidence):
 		confidence = d_values[best_comparison]
 
 		if confidence < recognition_confidence:
-			print("11111111")
 			ids[best_comparison]['Frames'] += 1
 			return best_comparison
 		else:
-			print("22222222")
 			init_dict(ids, person, candidate_descriptor.tolist())
 			return person
 
@@ -209,7 +207,8 @@ def save_data(ids):
 def attention_graphic(model_type, pk, attention_values):
 	plt.figure(figsize=(6, 4))
 	plt.title('Attention by frames')
-	plt.plot(attention_values)
+	plt.plot(list(range(1, len(attention_values)+1)), attention_values)
+	plt.xticks(list(range(1, len(attention_values)+1)))
 	plt.xlabel('Frame')
 	plt.ylabel('Attention')
 	plt.savefig('interface/digitalsignageimproved/graphs/' + model_type + '_Attention_' + str(pk) + '.png')

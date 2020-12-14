@@ -117,8 +117,8 @@ def process_viewer(data):
         face = cv2.cvtColor(frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]], cv2.COLOR_BGR2GRAY)
         emotion = demo.emotion_recognition(face, ids, key)
         # this function is just for visualization and debugging, should be commented
-        demo.display(key, bb[i], shape[i], emotion, frame)
-        cv2.imwrite('interface/digitalsignageimproved/'+key+'.jpg', frame)
+        # demo.display(key, bb[i], shape[i], emotion, frame)
+        # cv2.imwrite('interface/digitalsignageimproved/'+key+'.jpg', frame)
 
         relative_time = float(data['relative_time'])
         for timeline in view_dict['timelines']:
@@ -131,14 +131,16 @@ def process_viewer(data):
             db_timeline = Timeline.objects.get(pk=timeline['pk'])
             timeline_average_attention = json.loads(db_timeline.average_attention)
             if timeline_average_attention == {}:
-                timeline_average_attention = new_average_attention(key, calculated_attention, emotion)
+                timeline_average_attention = new_average_attention(key, calculated_attention, emotion, data['absolute_time'])
             elif key in timeline_average_attention.keys():
                 timeline_average_attention[key]['average_attention'].append(calculated_attention)
                 timeline_average_attention[key]['cumulative_attention'] += 1
                 timeline_average_attention[key]['emotions'][emotion] += 1
+                timeline_average_attention[key]['emotions_list'].append(emotion)
                 timeline_average_attention[key]['frames'] += 1
+                timeline_average_attention[key]['timestamps'].append(data['absolute_time'])
             else:
-                timeline_average_attention[key] = new_average_attention_id(calculated_attention, emotion)
+                timeline_average_attention[key] = new_average_attention_id(calculated_attention, emotion, data['absolute_time'])
 
             db_timeline.average_attention = json.dumps(timeline_average_attention)
             if db_timeline.attention_time is None:
@@ -158,14 +160,16 @@ def process_viewer(data):
                 db_content = Content.objects.get(pk=content['pk'])
                 content_average_attention = json.loads(db_content.average_attention)
                 if content_average_attention == {}:
-                    content_average_attention = new_average_attention(key, calculated_attention, emotion)
+                    content_average_attention = new_average_attention(key, calculated_attention, emotion, data['absolute_time'])
                 elif key in content_average_attention.keys():
                     content_average_attention[key]['average_attention'].append(calculated_attention)
                     content_average_attention[key]['cumulative_attention'] += 1
                     content_average_attention[key]['emotions'][emotion] += 1
+                    content_average_attention[key]['emotions_list'].append(emotion)
                     content_average_attention[key]['frames'] += 1
+                    content_average_attention[key]['timestamps'].append(data['absolute_time'])
                 else:
-                    content_average_attention[key] = new_average_attention_id(calculated_attention, emotion)
+                    content_average_attention[key] = new_average_attention_id(calculated_attention, emotion, data['absolute_time'])
 
                 db_content.average_attention = json.dumps(content_average_attention)
                 if db_content.attention_time is None:
@@ -181,14 +185,16 @@ def process_viewer(data):
 
         average_attention = json.loads(view.average_attention)
         if average_attention == {}:
-            average_attention = new_average_attention(key, calculated_attention, emotion)
+            average_attention = new_average_attention(key, calculated_attention, emotion, data['absolute_time'])
         elif key in average_attention.keys():
             average_attention[key]['average_attention'].append(calculated_attention)
             average_attention[key]['cumulative_attention'] += 1
             average_attention[key]['emotions'][emotion] += 1
+            average_attention[key]['emotions_list'].append(emotion)
             average_attention[key]['frames'] += 1
+            average_attention[key]['timestamps'].append(data['absolute_time'])
         else:
-            average_attention[key] = new_average_attention_id(calculated_attention, emotion)
+            average_attention[key] = new_average_attention_id(calculated_attention, emotion, data['absolute_time'])
 
         view.average_attention = json.dumps(average_attention)
         view.attention_time = view.attention_time + attention_time_increment
@@ -200,7 +206,7 @@ def process_viewer(data):
         json.dump(ids, outfile)
 
 
-def new_average_attention(key, calculated_attention, emotion):
+def new_average_attention(key, calculated_attention, emotion, timestamp):
     emotions = {
         "Neutral": 0,
         "Happiness": 0,
@@ -218,12 +224,14 @@ def new_average_attention(key, calculated_attention, emotion):
             'average_attention': [calculated_attention],
             'cumulative_attention': calculated_attention,
             'emotions': emotions,
-            'frames': 1
+            'emotions_list': [emotion],
+            'frames': 1,
+            'timestamps': [timestamp]
         }
     }
 
 
-def new_average_attention_id(calculated_attention, emotion):
+def new_average_attention_id(calculated_attention, emotion, timestamp):
     emotions = {
         "Neutral": 0,
         "Happiness": 0,
@@ -240,5 +248,7 @@ def new_average_attention_id(calculated_attention, emotion):
             'average_attention': [calculated_attention],
             'cumulative_attention': calculated_attention,
             'emotions': emotions,
-            'frames': 1
+            'emotions_list': [emotion],
+            'frames': 1,
+            'timestamps': [timestamp]
         }
