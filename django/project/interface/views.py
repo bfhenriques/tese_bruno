@@ -249,6 +249,8 @@ def add_timeline(request):
             post.last_modified = timezone.now()
             post.has_changed = True
             post.duration = 0
+            post.average_attention = {}
+            post.attention_time = 0
 
             post.creator = request.user
 

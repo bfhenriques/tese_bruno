@@ -10,6 +10,7 @@ from ffmpy import FFmpeg
 from ..models import Timeline, View
 from moviepy.editor import VideoFileClip
 import json
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 logger = logging.getLogger('File Manager Logger')
 ch = logging.StreamHandler()
@@ -113,16 +114,20 @@ def create_pdf_video(content_pk, path, pdf_path, slide_duration, resolution):
     # ffmpeg -y -f concat -safe 0 -i images.txt -c:v libx264 -vf "fps=25,format=yuv420p" -strict -2 out.mp4
     ff = FFmpeg(
         inputs={'pdf_%s.txt' % (os.getpid()): '-y -f concat -safe 0'},
-        outputs={path + 'tmp/%s_%s_%s.mp4' % (os.getpid(), content_pk, slide_duration):
+        outputs={path + 'tmp/tmp_%s_%s_%s.mp4' % (os.getpid(), content_pk, slide_duration):
                      '-vf "scale=%s:force_original_aspect_ratio=decrease,pad=%s:(ow-iw)/2:(oh-ih)/2"'
                      ' -c:v libx264 -pix_fmt yuv420p -strict -2' % (resolution, resolution)}
     )
     ff.run()
+
+    ffmpeg_extract_subclip(path + 'tmp/tmp_%s_%s_%s.mp4' % (os.getpid(), content_pk, slide_duration), 0, slide_duration * num_slides, targetname=path + 'tmp/%s_%s_%s.mp4' % (os.getpid(), content_pk, slide_duration))
+
     for tmp in all_paths:
         try:
             os.remove(tmp)
         except:
             continue
+    os.remove(path + 'tmp/tmp_%s_%s_%s.mp4' % (os.getpid(), content_pk, slide_duration))
     os.remove('pdf_%s.txt' % (os.getpid()))
 
     return path + 'tmp/%s_%s_%s.mp4' % (os.getpid(), content_pk, slide_duration), num_slides
@@ -132,7 +137,8 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
     # create preview
     if view_pk == 0:
         all_paths = []
-        contents = Timeline.objects.get(pk=timeline_pk).as_dict()['contents']
+        timeline = Timeline.objects.get(pk=timeline_pk).as_dict()
+        contents = timeline['contents']
         file = open('%s.txt' % (os.getpid()), 'w')
         duration = 0
         for content in contents:
@@ -178,7 +184,6 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
                                  path + 'tmp/ppt%s_%s_%s.pdf' % (os.getpid(), content['pk'], content['duration']),
                                  content['duration'], resolution)
                 os.remove(path + 'tmp/ppt%s_%s_%s.pdf' % (os.getpid(), content['pk'], content['duration']))
-
             elif content['file_type'] == 'pdf':
                 tmp_path = path + 'tmp/%s_%s_%s.mp4' % (os.getpid(), content['pk'], content['duration'])
                 # if timeline_content has already been created
@@ -192,9 +197,9 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
             all_paths.append(tmp_path)
             file.write('file ' + tmp_path + '\n')
 
-            if (content['file_type'] == 'ppt' or content['file_type'] == 'pdf'):
+            if content['file_type'] == 'ppt' or content['file_type'] == 'pdf':
                 duration += content['duration'] * num_slides
-            else :
+            else:
                 duration += content['duration']
 
         file.close()
@@ -204,6 +209,7 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
             outputs={path + '%s.mp4' % timeline_pk: '-c copy -strict -2'}
         )
         ff.run()
+
         for tmp in all_paths:
             try:
                 os.remove(tmp)
@@ -212,19 +218,15 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
         os.remove('%s.txt' % (os.getpid()))
 
         timeline = Timeline.objects.get(pk=timeline_pk)
-        timeline.duration = duration
+        timeline.duration += duration
         timeline.average_attention = json.dumps(dict())
         timeline.attention_time = 0
         timeline.save()
-
-
     else:
         all_paths = []
         contents = Timeline.objects.get(pk=timeline_pk).as_dict()['contents']
         file = open('%s.txt' % (os.getpid()), 'w')
-
         for content in contents:
-
             if content['file_type'] == 'image':
                 tmp_path = path + 'tmp/%s_%s_%s.mp4' % (os.getpid(), content['pk'], content['duration'])
 
@@ -276,7 +278,6 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
                                  path + 'tmp/ppt%s_%s_%s.pdf' % (os.getpid(), content['pk'], content['duration']),
                                  content['duration'], resolution)
                 os.remove(path + 'tmp/ppt%s_%s_%s.pdf' % (os.getpid(), content['pk'], content['duration']))
-
             elif content['file_type'] == 'pdf':
                 tmp_path, x = create_pdf_video(content['pk'], path, content['path'], content['duration'], resolution)
             else:
@@ -305,6 +306,7 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
 
 def create_view(view_pk, view_resolution, view_configured=False):
     timelines = View.objects.get(pk=view_pk).as_dict()['timelines']
+
     all_paths = []
     if len(timelines) > 0:
         file = open('%s_%s.txt' % (os.getpid(), view_pk), 'w')
