@@ -262,7 +262,8 @@ def add_timeline(request):
             durations = request.POST.getlist('durations')
 
             for index in range(0, len(pks)):
-                TimelineContents.objects.create(timeline_id=post.id, content_id=pks[index], orderindex=index+1, duration=durations[index])
+                TimelineContents.objects.create(timeline_id=post.id, content_id=pks[index], orderindex=index+1,
+                                                duration=durations[index], num_slides=1)
 
             if len(pks) > 0:
                 thread = threading.Thread(target=file_manager.create_timeline, args=(post.pk,))
@@ -307,7 +308,7 @@ def edit_timeline(request, pk):
 
             for index in range(0, len(pks)):
                 TimelineContents.objects.create(timeline_id=post.id, content_id=pks[index], orderindex=index + 1,
-                                                duration=durations[index])
+                                                duration=durations[index], num_slides=1)
 
             if len(pks) > 0:
                 thread = threading.Thread(target=file_manager.create_timeline, args=(post.pk,))

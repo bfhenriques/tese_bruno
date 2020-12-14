@@ -7,7 +7,7 @@ import coloredlogs
 import pptx
 import subprocess
 from ffmpy import FFmpeg
-from ..models import Timeline, View
+from ..models import Timeline, View, TimelineContents
 from moviepy.editor import VideoFileClip
 import json
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -142,6 +142,7 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
         file = open('%s.txt' % (os.getpid()), 'w')
         duration = 0
         for content in contents:
+            timeline_content = TimelineContents.objects.get(content_id=content['pk'], timeline_id=timeline_pk)
             if content['file_type'] == 'image':
                 tmp_path = path + 'tmp/%s_%s_%s.mp4' % (os.getpid(), content['pk'], content['duration'])
                 # if timeline_content has already been created
@@ -199,6 +200,8 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
 
             if content['file_type'] == 'ppt' or content['file_type'] == 'pdf':
                 duration += content['duration'] * num_slides
+                timeline_content.num_slides = num_slides
+                timeline_content.save()
             else:
                 duration += content['duration']
 
@@ -218,7 +221,7 @@ def create_timeline(timeline_pk, path='interface/media/Timelines/', view_pk=0, r
         os.remove('%s.txt' % (os.getpid()))
 
         timeline = Timeline.objects.get(pk=timeline_pk)
-        timeline.duration += duration
+        timeline.duration = duration
         timeline.average_attention = json.dumps(dict())
         timeline.attention_time = 0
         timeline.save()

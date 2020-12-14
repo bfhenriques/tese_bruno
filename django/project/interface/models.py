@@ -74,7 +74,9 @@ class Timeline(models.Model):
         contents = []
         for content in TimelineContents.objects.filter(timeline_id=self.pk).order_by('orderindex'):
             aux_content = Content.objects.get(pk=content.content.pk).as_dict()
+            aux_content['pk'] = content.content.pk
             aux_content['duration'] = content.duration
+            aux_content['num_slides'] = content.num_slides
             contents.append(aux_content)
         return {
             "pk": self.pk,
@@ -144,6 +146,7 @@ class TimelineContents(models.Model):
     content = models.ForeignKey(Content, on_delete=models.CASCADE)
     orderindex = models.PositiveIntegerField()
     duration = models.PositiveIntegerField()
+    num_slides = models.PositiveIntegerField()
 
     def __str__(self):
         return " ".join([self.content.__str__(), self.timeline.__str__(), str(self.orderindex), str(self.duration)])
@@ -155,6 +158,7 @@ class TimelineContents(models.Model):
             "content": self.content,
             "orderindex": self.orderindex,
             "duration": self.duration,
+            "num_slides": self.num_slides
         }
 
 

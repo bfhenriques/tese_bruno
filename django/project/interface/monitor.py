@@ -151,8 +151,8 @@ def process_viewer(data):
 
             break_flag = False
             for content in timeline['contents']:
-                if content['duration'] < relative_time:
-                    relative_time -= content['duration']
+                if content['duration'] * content['num_slides'] < relative_time:
+                    relative_time -= content['duration'] * content['num_slides']
                     if relative_time < 0:
                         relative_time = 0
                     continue
