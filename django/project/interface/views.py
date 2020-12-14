@@ -183,11 +183,16 @@ def info_view(request, pk):
         attention_chart = demo.attention_graphic('View', pk, attention_values)
         emotions_chart = demo.emotions_graphic('View', pk, emotions)
 
+    if view.attention_time == 0 or view.display_time == 0:
+        attention_percentage = 0.0
+    else:
+        attention_percentage = round(view.attention_time * 100 / view.display_time > 0, 2)
+
     info = {
         'view': view_as_dict,
         'display_time': demo.hms(view.display_time),
         'attention_time': demo.hms(view.attention_time),
-        'attention_percentage': round(view.attention_time * 100 / view.display_time, 2),
+        'attention_percentage': attention_percentage,
         'average_attention': round(average_attention_value, 2),
         'cumulative_attention': round(cumulative_attention_value, 2),
         'attention_chart': attention_chart,
