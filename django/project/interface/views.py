@@ -135,7 +135,8 @@ def edit_view(request, pk):
         context = {"form": form,
                    "all_timelines": json.dumps({"data": all_timelines}),
                    "table_timelines": json.dumps({"data": table_timelines}),
-                   'permission': get_user_permissions(request.user.pk)}
+                   'permission': get_user_permissions(request.user.pk),
+                   'video_path': 'interface/media/Views/%s.mp4' % pk}
         return render(request, 'interface/View/edit_view.html', context)
 
 
