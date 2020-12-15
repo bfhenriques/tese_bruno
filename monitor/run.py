@@ -36,7 +36,7 @@ logger.propagate = False
 # SERVER_URL = 'http://dmmd.ieeta.pt/'
 SERVER_URL = 'http://192.168.1.108/'
 
-viewer_flag = Event()
+view_running = Event()
 
 
 class SharedSpace:
@@ -212,20 +212,18 @@ class SharedSpace:
             return False
 
         client.close()
+        view_running.set()
         return True
 
     def viewer_detected(self, frame):
-        logger.info('Viewer(s) detection start - absolute: {} - relative: {}'.format(time(), self.omxp.position()))
+        logger.info('Viewer(s) detected - absolute: {} - relative: {}'.format(time(), self.omxp.position()))
 
-        success = False
-        while not success:
-            try:
-                success = self.report_viewer_detected(self, frame)
-                if not success:
-                    logger.info('Problem reporting attention start')
-
-            except:
+        try:
+            success = self.report_viewer_detected(self, frame)
+            if not success:
                 logger.info('Problem reporting attention start')
+        except:
+            logger.info('Problem reporting attention start')
 
     def report_viewer_detected(self, frame):
         logging.info('Reporting attention start')
@@ -270,17 +268,18 @@ class CameraThread(Thread):
             camera.framerate = 24
 
             while True:
-                frame = np.empty((240, 320, 3), dtype=np.uint8)
-                camera.capture(frame, 'bgr')
+                if view_running.is_set():
+                    frame = np.empty((240, 320, 3), dtype=np.uint8)
+                    camera.capture(frame, 'bgr')
 
-                bb = self.shared.detect_face(self.shared, frame)
+                    bb = self.shared.detect_face(self.shared, frame)
 
-                if len(bb) > 0:
-                    for i in range(len(bb)):
-                        # cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
-                        retval, buffer = cv2.imencode('.jpg', frame)
-                        frame_as_text = base64.b64encode(buffer)
-                        self.shared.viewer_detected(self.shared, frame_as_text)
+                    if len(bb) > 0:
+                        for i in range(len(bb)):
+                            # cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
+                            retval, buffer = cv2.imencode('.jpg', frame)
+                            frame_as_text = base64.b64encode(buffer)
+                            self.shared.viewer_detected(self.shared, frame_as_text)
 
 
 class MonitorThread(Thread):
@@ -310,22 +309,25 @@ class MonitorThread(Thread):
                 logger.info('Server offline. Retrying in 30s...')
                 sleep(30)
 
-        success = False
-        while not success:
-            try:
-                success = self.shared.get_video(self.shared)
-                if not success:
+        if os.path.exists('/home/pi/dmmd/monitor/view.mp4'):
+            logger.info('Video exists locally')
+            self.shared.omxp = OMXPlayer('/home/pi/dmmd/monitor/view.mp4', args=['-g', '-b', '--no-osd', '--loop'])
+            self.shared.report_view_start(self.shared)
+        else:
+            success = False
+            while not success:
+                try:
+                    success = self.shared.get_video(self.shared)
+                    if not success:
+                        logger.info('Video unavailable. Retrying in 30s...')
+                        sleep(30)
+                except:
                     logger.info('Video unavailable. Retrying in 30s...')
                     sleep(30)
-            except:
-                logger.info('Video unavailable. Retrying in 30s...')
-                sleep(30)
 
-        logger.info('Video download complete')
-
-        self.shared.omxp = OMXPlayer('/home/pi/dmmd/monitor/view.mp4', args=['-g', '-b', '--no-osd', '--loop'])
-
-        self.shared.report_view_start(self.shared)
+            logger.info('Video download complete')
+            self.shared.omxp = OMXPlayer('/home/pi/dmmd/monitor/view.mp4', args=['-g', '-b', '--no-osd', '--loop'])
+            self.shared.report_view_start(self.shared)
 
         while True:
             try:
@@ -348,9 +350,7 @@ class MonitorThread(Thread):
                         sleep(30)
 
                 logger.info('Video download complete')
-
                 self.shared.omxp.load('/home/pi/dmmd/monitor/view.mp4')
-
                 self.shared.report_view_start(self.shared)
             except:
                 logger.info('Server offline. Retrying in 60s...')
