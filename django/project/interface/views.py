@@ -187,7 +187,7 @@ def info_view(request, pk):
     if view.attention_time == 0 or view.display_time == 0:
         attention_percentage = 0.0
     else:
-        attention_percentage = round(view.attention_time * 100 / view.display_time > 0, 2)
+        attention_percentage = round(view.attention_time * 100 / view.display_time, 2)
 
     info = {
         'view': view_as_dict,
