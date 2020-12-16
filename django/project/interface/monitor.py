@@ -10,7 +10,7 @@ import numpy as np
 import json
 from .digitalsignageimproved import demo
 
-attention_time_increment = 2
+attention_time_increment = 1
 
 
 def new_monitor(request):

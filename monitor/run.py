@@ -275,11 +275,10 @@ class CameraThread(Thread):
                     bb = self.shared.detect_face(self.shared, frame)
 
                     if len(bb) > 0:
-                        for i in range(len(bb)):
-                            # cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
-                            retval, buffer = cv2.imencode('.jpg', frame)
-                            frame_as_text = base64.b64encode(buffer)
-                            self.shared.viewer_detected(self.shared, frame_as_text)
+                        # cropped_frame = frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]]
+                        retval, buffer = cv2.imencode('.jpg', frame)
+                        frame_as_text = base64.b64encode(buffer)
+                        self.shared.viewer_detected(self.shared, frame_as_text)
 
 
 class MonitorThread(Thread):
