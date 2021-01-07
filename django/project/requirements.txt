@@ -8,7 +8,7 @@ ffmpy==0.2.2
 humanfriendly==4.10
 imageio==2.1.2
 language-selector==0.1
-lxml==4.2.1
+lxml==4.6.2
 moviepy==0.2.3.2
 numpy==1.14.1
 pdf2image==0.1.10
