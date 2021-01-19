@@ -264,12 +264,12 @@ class CameraThread(Thread):
         logger.info('Initializing Camera')
 
         with picamera.PiCamera() as camera:
-            camera.resolution = (320, 240)
-            camera.framerate = 24
+            camera.resolution = (640, 480)
+            camera.framerate = 30
 
             while True:
                 if view_running.is_set():
-                    frame = np.empty((240, 320, 3), dtype=np.uint8)
+                    frame = np.empty((480, 640, 3), dtype=np.uint8)
                     camera.capture(frame, 'bgr')
 
                     bb = self.shared.detect_face(self.shared, frame)

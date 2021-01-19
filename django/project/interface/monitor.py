@@ -111,11 +111,14 @@ def process_viewer(data):
 
     for i in range(len(bb)):
         key = demo.face_recognition(frame, raw_shape[i], ids, view.recognition_confidence)
+        print(key)
         eulerAngles = demo.head_pose(dims, shape[i])
         calculated_attention = demo.calculate_attention(ids, key, eulerAngles)
+        print(calculated_attention)
         # This is the face sent from the raspberry, needs to be converted to grayscale for emotion recognition
         face = cv2.cvtColor(frame[bb[i][1]:bb[i][3], bb[i][0]:bb[i][2]], cv2.COLOR_BGR2GRAY)
         emotion = demo.emotion_recognition(face, ids, key)
+        print(emotion)
         # this function is just for visualization and debugging, should be commented
         # demo.display(key, bb[i], shape[i], emotion, frame)
         # cv2.imwrite('interface/digitalsignageimproved/'+key+'.jpg', frame)
