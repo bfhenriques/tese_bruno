@@ -151,7 +151,9 @@ def info_view(request, pk):
 
     view = View.objects.get(pk=pk)
     view_as_dict = view.as_dict()
-    attention_chart_as_text = ''
+
+    period_attention_chart = ''
+    period_emotions_chart = ''
 
     if request.method == 'POST':
         print(request.POST)
@@ -177,7 +179,7 @@ def info_view(request, pk):
         stage3_data = []
         stage4_data = []
 
-        view_data = view_as_dict['average_attention']  # change this to insert different data
+        view_data = view_as_dict['average_attention']
         data = [i for i in range(0, len(view_data.keys()))]
 
         index = 0
@@ -248,7 +250,24 @@ def info_view(request, pk):
         with open('interface/digitalsignageimproved/graphs/View_Attention_' + str(pk) + '.png',
                   "rb") as chart:
             attention_chart_as_text = base64.b64encode(chart.read())
-            attention_chart_as_text = 'data:image/png;base64,' + attention_chart_as_text.decode('utf-8')
+            period_attention_chart = 'data:image/png;base64,' + attention_chart_as_text.decode('utf-8')
+
+        plt.figure(figsize=(10, 6))
+        plt.title(view_as_dict['name'] + ' Emotions over time')
+        plt.stem(list(range(0, 480, 1)), emotions_array)
+        plt.xticks([0, 120, 240, 360, 480],
+                   ['stage 1', 'stage 2', 'stage 3', 'stage4', 'end'])
+
+        plt.savefig('interface/digitalsignageimproved/graphs/View_Emotions_' + str(pk) + '.png')
+
+        with open('interface/digitalsignageimproved/graphs/View_Emotions_' + str(pk) + '.png',
+                  "rb") as chart:
+            emotions_chart_as_text = base64.b64encode(chart.read())
+            period_emotions_chart = 'data:image/png;base64,' + emotions_chart_as_text.decode('utf-8')
+
+        form = ViewInfoForm(request.POST)
+    else:
+        form = ViewInfoForm()
 
     average_attention = json.loads(view.average_attention)
     attention_values = []
@@ -283,8 +302,8 @@ def info_view(request, pk):
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
         average_attention_value = cumulative_attention_value / entries_count
-        # attention_chart = demo.attention_graphic('View', pk, attention_values)
-        # emotions_chart = demo.emotions_graphic('View', pk, emotions)
+        attention_chart = demo.attention_graphic('View', pk, attention_values)
+        emotions_chart = demo.emotions_graphic('View', pk, emotions)
 
     if view.attention_time == 0 or view.display_time == 0:
         attention_percentage = 0.0
@@ -298,13 +317,13 @@ def info_view(request, pk):
         'attention_percentage': attention_percentage,
         'average_attention': round(average_attention_value, 2),
         'cumulative_attention': round(cumulative_attention_value, 2),
-        'attention_chart': attention_chart_as_text,
+        'attention_chart': attention_chart,
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
-        'number_of_frames': entries_count
+        'number_of_frames': entries_count,
+        'period_attention_chart': period_attention_chart,
+        'period_emotions_chart': period_emotions_chart
     }
-
-    form = ViewInfoForm()
 
     context = {'info': info,
                'form': form,
