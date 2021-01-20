@@ -241,7 +241,7 @@ def info_view(request, pk):
         plt.title(view_as_dict['name'] + ' Attention over time')
         plt.stem(list(range(0, 480, 1)), attention_array)
         plt.xticks([0, 120, 240, 360, 480],
-                   ['stage 1\n0min', 'stage 2\n2min', 'stage 3\n4min', 'stage4\n6min', 'end\n8min'])
+                   ['stage 1', 'stage 2', 'stage 3', 'stage4', 'end'])
 
         plt.savefig('interface/digitalsignageimproved/graphs/View_Attention_' + str(pk) + '.png')
 
