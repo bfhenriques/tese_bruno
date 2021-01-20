@@ -89,8 +89,8 @@ class ViewForm(forms.ModelForm):
 
 
 class ViewInfoForm(forms.Form):
-    start_time = forms.FloatField(label="Start Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    stage1_end_time = forms.FloatField(label="Stage 1 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    stage2_end_time = forms.FloatField(label="Stage 2 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    stage3_end_time = forms.FloatField(label="Stage 3 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    end_time = forms.FloatField(label="End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    start_time = forms.IntegerField(label="Start Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stage1_end_time = forms.IntegerField(label="Stage 1 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stage2_end_time = forms.IntegerField(label="Stage 2 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stage3_end_time = forms.IntegerField(label="Stage 3 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    end_time = forms.IntegerField(label="End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))

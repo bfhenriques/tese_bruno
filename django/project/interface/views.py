@@ -155,15 +155,20 @@ def info_view(request, pk):
 
     if request.method == 'POST':
         print(request.POST)
-        start_time_ms = request.POST['start_time']
-        stage1_end_time_ms = request.POST['stage1_end_time']
-        stage2_end_time_ms = request.POST['stage2_end_time']
-        stage3_end_time_ms = request.POST['stage3_end_time']
-        end_time_ms = request.POST['end_time']
+        start_time_ms = int(request.POST['start_time'])
+        start_time = int(start_time_ms/1000)
+        stage1_end_time_ms = int(request.POST['stage1_end_time'])
+        stage1_end_time = int(stage1_end_time_ms / 1000)
+        stage2_end_time_ms = int(request.POST['stage2_end_time'])
+        stage2_end_time = int(stage2_end_time_ms / 1000)
+        stage3_end_time_ms = int(request.POST['stage3_end_time'])
+        stage3_end_time = int(stage3_end_time_ms / 1000)
+        end_time_ms = int(request.POST['end_time'])
+        end_time = int(end_time_ms / 1000)
 
         attention_array = [0 for i in list(range(0, 480, 1))]
         emotions_array = ["" for i in list(range(0, 480, 1))]
-        time_array = list(range(start_time_ms/1000, end_time_ms/1000, 1))
+        time_array = list(range(start_time, end_time, 1))
 
         total_records = 0
         full_valid_data = []
@@ -196,20 +201,20 @@ def info_view(request, pk):
         stage3_timestamps = []
         stage4_timestamps = []
         for timestamp in total_timestamps:
-            if datetime.fromtimestamp(start_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(end_time_ms / 1000):
+            if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(end_time):
                 valid_timestamps.append(timestamp)
-            if datetime.fromtimestamp(start_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(stage1_end_time_ms / 1000):
+            if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(stage1_end_time):
                 stage1_timestamps.append(timestamp)
-            if datetime.fromtimestamp(stage1_end_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(stage2_end_time_ms / 1000):
+            if datetime.fromtimestamp(stage1_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(stage2_end_time):
                 stage2_timestamps.append(timestamp)
-            if datetime.fromtimestamp(stage2_end_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(stage3_end_time_ms / 1000):
+            if datetime.fromtimestamp(stage2_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(stage3_end_time):
                 stage3_timestamps.append(timestamp)
-            if datetime.fromtimestamp(stage3_end_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(end_time_ms / 1000):
+            if datetime.fromtimestamp(stage3_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(end_time):
                 stage4_timestamps.append(timestamp)
 
         valid_timestamps.sort()
@@ -233,7 +238,7 @@ def info_view(request, pk):
                 missed_count += 1
 
         plt.figure(figsize=(10, 6))
-        plt.title(view_as_dict['name'] + 'Attention over time')
+        plt.title(view_as_dict['name'] + ' Attention over time')
         plt.stem(list(range(0, 480, 1)), attention_array)
         plt.xticks([0, 120, 240, 360, 480],
                    ['stage 1\n0min', 'stage 2\n2min', 'stage 3\n4min', 'stage4\n6min', 'end\n8min'])
@@ -243,6 +248,7 @@ def info_view(request, pk):
         with open('interface/digitalsignageimproved/graphs/View_Attention_' + str(pk) + '.png',
                   "rb") as chart:
             attention_chart_as_text = base64.b64encode(chart.read())
+            attention_chart_as_text = 'data:image/png;base64,' + attention_chart_as_text.decode('utf-8')
 
     average_attention = json.loads(view.average_attention)
     attention_values = []
