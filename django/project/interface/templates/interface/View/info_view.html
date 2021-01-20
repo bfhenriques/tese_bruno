@@ -53,6 +53,35 @@
                 <div class="col-md-3 text-md-right"><strong>Number of Captured Frames</strong></div>
                 <div class="col-md-auto">{{info.number_of_frames}}</div>
             </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row mt-2">
+                    <div class="col-md-3 text-md-right"><strong>{{form.start_time.label}}:</strong></div>
+                    <div class="col-md-auto">{{form.start_time}}</div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3 text-md-right"><strong>{{form.stage1_end_time.label}}:</strong></div>
+                    <div class="col-md-auto">{{form.stage1_end_time}}</div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3 text-md-right"><strong>{{form.stage2_end_time.label}}:</strong></div>
+                    <div class="col-md-auto">{{form.stage2_end_time}}</div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3 text-md-right"><strong>{{form.stage3_end_time.label}}:</strong></div>
+                    <div class="col-md-auto">{{form.stage3_end_time}}</div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3 text-md-right"><strong>{{form.end_time.label}}:</strong></div>
+                    <div class="col-md-auto">{{form.end_time}}</div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3 text-md-right">
+                        <button class="btn btn-secondary" type="submit">Submit</button>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" type="submit">Submit</button>
+            </form>
             <div class="row mt-2">
                 <div class="col-md-3 text-md-right"></div>
                 {% if info.attention_chart != '' %}

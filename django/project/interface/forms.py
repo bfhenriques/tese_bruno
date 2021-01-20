@@ -40,7 +40,7 @@ class UserEditForm(UserChangeForm):
         model = User
         fields = ('first_name', 'last_name', 'username', 'email', )
 
-    def  clean_password(self):
+    def clean_password(self):
         return ""
 
 
@@ -86,3 +86,11 @@ class ViewForm(forms.ModelForm):
         model = View
         fields = ('name', 'recognition_confidence')
         exclude = {'creation_date', 'last_modified', 'duration', 'resolution', 'mac'}
+
+
+class ViewInfoForm(forms.Form):
+    start_time = forms.FloatField(label="Start Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stage1_end_time = forms.FloatField(label="Stage 1 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stage2_end_time = forms.FloatField(label="Stage 2 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    stage3_end_time = forms.FloatField(label="Stage 3 End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    end_time = forms.FloatField(label="End Time", widget=forms.NumberInput(attrs={'class': 'form-control'}))

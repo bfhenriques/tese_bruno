@@ -4,13 +4,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils import timezone
 from .models import View, Timeline, Content, TimelineContents, ViewTimelines, UserProfile
-from .forms import UserCreateForm, UserEditForm, ContentForm, ContentEditForm, TimelineForm, ViewForm
+from .forms import UserCreateForm, UserEditForm, ContentForm, ContentEditForm, TimelineForm, ViewForm, ViewInfoForm
 from .scripts import file_manager
 import json
 import threading
 from django.http import FileResponse
 from .digitalsignageimproved import demo
 import datetime
+from datetime import datetime
+import matplotlib.pyplot as plt
+import base64
+from matplotlib.dates import (YEARLY, DateFormatter, rrulewrapper, RRuleLocator, drange)
 
 
 def get_user_permissions(pk):
@@ -147,6 +151,98 @@ def info_view(request, pk):
 
     view = View.objects.get(pk=pk)
     view_as_dict = view.as_dict()
+    attention_chart_as_text = ''
+
+    if request.method == 'POST':
+        print(request.POST)
+        start_time_ms = request.POST['start_time']
+        stage1_end_time_ms = request.POST['stage1_end_time']
+        stage2_end_time_ms = request.POST['stage2_end_time']
+        stage3_end_time_ms = request.POST['stage3_end_time']
+        end_time_ms = request.POST['end_time']
+
+        attention_array = [0 for i in list(range(0, 480, 1))]
+        emotions_array = ["" for i in list(range(0, 480, 1))]
+        time_array = list(range(start_time_ms/1000, end_time_ms/1000, 1))
+
+        total_records = 0
+        full_valid_data = []
+        stage1_data = []
+        stage2_data = []
+        stage3_data = []
+        stage4_data = []
+
+        view_data = view_as_dict['average_attention']  # change this to insert different data
+        data = [i for i in range(0, len(view_data.keys()))]
+
+        index = 0
+        for key in view_data.keys():
+            data[index] = view_data[key]
+            index += 1
+
+        total_timestamps = []
+        total_attention_values = []
+        total_emotions = []
+        for subject in data:
+            total_timestamps += subject['timestamps']
+            total_attention_values += subject['average_attention']
+            total_emotions += subject['emotions_list']
+
+        total_timestamps = [int(i) for i in total_timestamps]
+
+        valid_timestamps = []
+        stage1_timestamps = []
+        stage2_timestamps = []
+        stage3_timestamps = []
+        stage4_timestamps = []
+        for timestamp in total_timestamps:
+            if datetime.fromtimestamp(start_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(end_time_ms / 1000):
+                valid_timestamps.append(timestamp)
+            if datetime.fromtimestamp(start_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(stage1_end_time_ms / 1000):
+                stage1_timestamps.append(timestamp)
+            if datetime.fromtimestamp(stage1_end_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(stage2_end_time_ms / 1000):
+                stage2_timestamps.append(timestamp)
+            if datetime.fromtimestamp(stage2_end_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(stage3_end_time_ms / 1000):
+                stage3_timestamps.append(timestamp)
+            if datetime.fromtimestamp(stage3_end_time_ms / 1000) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                    < datetime.fromtimestamp(end_time_ms / 1000):
+                stage4_timestamps.append(timestamp)
+
+        valid_timestamps.sort()
+        stage1_timestamps.sort()
+        stage2_timestamps.sort()
+        stage3_timestamps.sort()
+        stage4_timestamps.sort()
+
+        count = 0
+        inner_count = 0
+        missed_count = 0
+        for timestamp in valid_timestamps:
+            count += 1
+            if round(timestamp / 1000) in time_array:
+                inner_count += 1
+                attention_array[time_array.index(round(timestamp / 1000))] = total_attention_values[
+                    total_timestamps.index(timestamp)]
+                emotions_array[time_array.index(round(timestamp / 1000))] = total_emotions[
+                    total_timestamps.index(timestamp)]
+            else:
+                missed_count += 1
+
+        plt.figure(figsize=(10, 6))
+        plt.title(view_as_dict['name'] + 'Attention over time')
+        plt.stem(list(range(0, 480, 1)), attention_array)
+        plt.xticks([0, 120, 240, 360, 480],
+                   ['stage 1\n0min', 'stage 2\n2min', 'stage 3\n4min', 'stage4\n6min', 'end\n8min'])
+
+        plt.savefig('interface/digitalsignageimproved/graphs/View_Attention_' + str(pk) + '.png')
+
+        with open('interface/digitalsignageimproved/graphs/View_Attention_' + str(pk) + '.png',
+                  "rb") as chart:
+            attention_chart_as_text = base64.b64encode(chart.read())
 
     average_attention = json.loads(view.average_attention)
     attention_values = []
@@ -181,8 +277,8 @@ def info_view(request, pk):
             emotions['Contempt'] += average_attention[person]['emotions']['Contempt']
 
         average_attention_value = cumulative_attention_value / entries_count
-        attention_chart = demo.attention_graphic('View', pk, attention_values)
-        emotions_chart = demo.emotions_graphic('View', pk, emotions)
+        # attention_chart = demo.attention_graphic('View', pk, attention_values)
+        # emotions_chart = demo.emotions_graphic('View', pk, emotions)
 
     if view.attention_time == 0 or view.display_time == 0:
         attention_percentage = 0.0
@@ -196,13 +292,16 @@ def info_view(request, pk):
         'attention_percentage': attention_percentage,
         'average_attention': round(average_attention_value, 2),
         'cumulative_attention': round(cumulative_attention_value, 2),
-        'attention_chart': attention_chart,
+        'attention_chart': attention_chart_as_text,
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count
     }
 
+    form = ViewInfoForm()
+
     context = {'info': info,
+               'form': form,
                'permission': get_user_permissions(request.user.pk)}
 
     return render(request, 'interface/View/info_view.html', context)
