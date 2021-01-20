@@ -154,22 +154,35 @@ def info_view(request, pk):
 
     period_attention_chart = ''
     period_emotions_chart = ''
+    period_recognitions = 0
+    period_average_attention = 0
+    period_cumulative_attention = 0
+    period_emotions = {
+        "Neutral": 0,
+        "Happiness": 0,
+        "Surprise": 0,
+        "Sadness": 0,
+        "Anger": 0,
+        "Disgust": 0,
+        "Fear": 0,
+        "Contempt": 0
+    }
+    period_frames = 0
 
     if request.method == 'POST':
-        print(request.POST)
         start_time_ms = int(request.POST['start_time'])
         start_time = int(start_time_ms/1000)
-        stage1_end_time_ms = int(request.POST['stage1_end_time'])
+        '''stage1_end_time_ms = int(request.POST['stage1_end_time'])
         stage1_end_time = int(stage1_end_time_ms / 1000)
         stage2_end_time_ms = int(request.POST['stage2_end_time'])
         stage2_end_time = int(stage2_end_time_ms / 1000)
         stage3_end_time_ms = int(request.POST['stage3_end_time'])
-        stage3_end_time = int(stage3_end_time_ms / 1000)
+        stage3_end_time = int(stage3_end_time_ms / 1000)'''
         end_time_ms = int(request.POST['end_time'])
         end_time = int(end_time_ms / 1000)
 
-        attention_array = [0 for i in list(range(0, 480, 1))]
-        emotions_array = ["" for i in list(range(0, 480, 1))]
+        '''attention_array = [0 for i in list(range(0, start_time - end_time, 1))]
+        emotions_array = ["" for i in list(range(0, start_time - end_time, 1))]
         time_array = list(range(start_time, end_time, 1))
 
         total_records = 0
@@ -177,7 +190,7 @@ def info_view(request, pk):
         stage1_data = []
         stage2_data = []
         stage3_data = []
-        stage4_data = []
+        stage4_data = []'''
 
         view_data = view_as_dict['average_attention']
         data = [i for i in range(0, len(view_data.keys()))]
@@ -190,58 +203,89 @@ def info_view(request, pk):
         total_timestamps = []
         total_attention_values = []
         total_emotions = []
+
+        index = 0
         for subject in data:
-            total_timestamps += subject['timestamps']
+            subject_valid_timestamps = []
+            for timestamp in subject['timestamps']:
+                if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                        < datetime.fromtimestamp(end_time):
+                    subject_valid_timestamps.append(timestamp)
+
+            if len(subject_valid_timestamps) > 0:
+                period_recognitions += 1
+                period_frames += len(subject_valid_timestamps)
+
+            for timestamp in subject_valid_timestamps:
+                total_attention_values.append(data[index]['average_attention'][subject['timestamps'].index(timestamp)])
+                if data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Neutral':
+                    period_emotions['Neutral'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Happiness':
+                    period_emotions['Happiness'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Surprise':
+                    period_emotions['Surprise'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Sadness':
+                    period_emotions['Sadness'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Anger':
+                    period_emotions['Anger'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Disgust':
+                    period_emotions['Disgust'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Fear':
+                    period_emotions['Fear'] += 1
+                elif data[index]['emotions_list'][subject['timestamps'].index(timestamp)] == 'Contempt':
+                    period_emotions['Contempt'] += 1
+
+            index += 1
+
+            '''total_timestamps += subject['timestamps']
             total_attention_values += subject['average_attention']
             total_emotions += subject['emotions_list']
+            total_timestamps = [int(i) for i in total_timestamps]
+            valid_timestamps = []
+            stage1_timestamps = []
+            stage2_timestamps = []
+            stage3_timestamps = []
+            stage4_timestamps = []
+            for timestamp in total_timestamps:
+                if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                        < datetime.fromtimestamp(end_time):
+                    valid_timestamps.append(timestamp)
+                if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                        < datetime.fromtimestamp(stage1_end_time):
+                    stage1_timestamps.append(timestamp)
+                if datetime.fromtimestamp(stage1_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                        < datetime.fromtimestamp(stage2_end_time):
+                    stage2_timestamps.append(timestamp)
+                if datetime.fromtimestamp(stage2_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                        < datetime.fromtimestamp(stage3_end_time):
+                    stage3_timestamps.append(timestamp)
+                if datetime.fromtimestamp(stage3_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
+                        < datetime.fromtimestamp(end_time):
+                    stage4_timestamps.append(timestamp)
 
-        total_timestamps = [int(i) for i in total_timestamps]
+            valid_timestamps.sort()
+            stage1_timestamps.sort()
+            stage2_timestamps.sort()
+            stage3_timestamps.sort()
+            stage4_timestamps.sort()
 
-        valid_timestamps = []
-        stage1_timestamps = []
-        stage2_timestamps = []
-        stage3_timestamps = []
-        stage4_timestamps = []
-        for timestamp in total_timestamps:
-            if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(end_time):
-                valid_timestamps.append(timestamp)
-            if datetime.fromtimestamp(start_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(stage1_end_time):
-                stage1_timestamps.append(timestamp)
-            if datetime.fromtimestamp(stage1_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(stage2_end_time):
-                stage2_timestamps.append(timestamp)
-            if datetime.fromtimestamp(stage2_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(stage3_end_time):
-                stage3_timestamps.append(timestamp)
-            if datetime.fromtimestamp(stage3_end_time) < datetime.fromtimestamp(int(timestamp) / 1000) \
-                    < datetime.fromtimestamp(end_time):
-                stage4_timestamps.append(timestamp)
-
-        valid_timestamps.sort()
-        stage1_timestamps.sort()
-        stage2_timestamps.sort()
-        stage3_timestamps.sort()
-        stage4_timestamps.sort()
-
-        count = 0
-        inner_count = 0
-        missed_count = 0
-        for timestamp in valid_timestamps:
-            count += 1
-            if round(timestamp / 1000) in time_array:
-                inner_count += 1
-                attention_array[time_array.index(round(timestamp / 1000))] = total_attention_values[
-                    total_timestamps.index(timestamp)]
-                emotions_array[time_array.index(round(timestamp / 1000))] = total_emotions[
-                    total_timestamps.index(timestamp)]
-            else:
-                missed_count += 1
+            count = 0
+            inner_count = 0
+            missed_count = 0
+            for timestamp in valid_timestamps:
+                count += 1
+                if round(timestamp / 1000) in time_array:
+                    inner_count += 1
+                    attention_array[time_array.index(round(timestamp / 1000))] = total_attention_values[
+                        total_timestamps.index(timestamp)]
+                    emotions_array[time_array.index(round(timestamp / 1000))] = total_emotions[
+                        total_timestamps.index(timestamp)]
+                else:
+                    missed_count += 1
 
         plt.figure(figsize=(10, 6))
         plt.title(view_as_dict['name'] + ' Attention over time')
-        plt.stem(list(range(0, 480, 1)), attention_array)
+        plt.stem(list(range(0, start_time - end_time, 1)), attention_array)
         plt.xticks([0, 120, 240, 360, 480],
                    ['stage 1', 'stage 2', 'stage 3', 'stage4', 'end'])
 
@@ -254,7 +298,7 @@ def info_view(request, pk):
 
         plt.figure(figsize=(10, 6))
         plt.title(view_as_dict['name'] + ' Emotions over time')
-        plt.stem(list(range(0, 480, 1)), emotions_array)
+        plt.stem(list(range(0, start_time - end_time, 1)), emotions_array)
         plt.xticks([0, 120, 240, 360, 480],
                    ['stage 1', 'stage 2', 'stage 3', 'stage4', 'end'])
 
@@ -263,11 +307,17 @@ def info_view(request, pk):
         with open('interface/digitalsignageimproved/graphs/View_Emotions_' + str(pk) + '.png',
                   "rb") as chart:
             emotions_chart_as_text = base64.b64encode(chart.read())
-            period_emotions_chart = 'data:image/png;base64,' + emotions_chart_as_text.decode('utf-8')
+            period_emotions_chart = 'data:image/png;base64,' + emotions_chart_as_text.decode('utf-8')'''
+
+        if len(total_attention_values) > 0:
+            period_average_attention = sum(total_attention_values) / len(total_attention_values)
+            period_cumulative_attention = sum(total_attention_values)
 
         form = ViewInfoForm(request.POST)
+        period_active = True
     else:
         form = ViewInfoForm()
+        period_active = False
 
     average_attention = json.loads(view.average_attention)
     attention_values = []
@@ -321,8 +371,14 @@ def info_view(request, pk):
         'emotions_chart': emotions_chart,
         'number_of_recognitions': len(average_attention.keys()),
         'number_of_frames': entries_count,
-        'period_attention_chart': period_attention_chart,
-        'period_emotions_chart': period_emotions_chart
+        'period_active': period_active,
+        'period_recognitions': period_recognitions,
+        'period_frames': period_frames,
+        'period_average_attention': round(period_average_attention, 2),
+        'period_cumulative_attention': round(period_cumulative_attention, 2),
+        'period_emotions': period_emotions,
+        'period_attention_chart': '',
+        'period_emotions_chart': ''
     }
 
     context = {'info': info,

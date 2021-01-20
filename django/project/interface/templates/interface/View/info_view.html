@@ -72,10 +72,10 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="row mt-2">
-                    <div class="col-md-3 text-md-right"><strong>{{form.start_time.label}} (ms):</strong></div>
+                    <div class="col-md-3 text-md-right"><strong>{{form.start_time.label}} (ms)</strong></div>
                     <div class="col-md-auto">{{form.start_time}}</div>
                 </div>
-                <div class="row mt-2">
+                <!--<div class="row mt-2">
                     <div class="col-md-3 text-md-right"><strong>{{form.stage1_end_time.label}} (ms):</strong></div>
                     <div class="col-md-auto">{{form.stage1_end_time}}</div>
                 </div>
@@ -86,9 +86,9 @@
                 <div class="row mt-2">
                     <div class="col-md-3 text-md-right"><strong>{{form.stage3_end_time.label}} (ms):</strong></div>
                     <div class="col-md-auto">{{form.stage3_end_time}}</div>
-                </div>
+                </div>-->
                 <div class="row mt-2">
-                    <div class="col-md-3 text-md-right"><strong>{{form.end_time.label}} (ms):</strong></div>
+                    <div class="col-md-3 text-md-right"><strong>{{form.end_time.label}} (ms)</strong></div>
                     <div class="col-md-auto">{{form.end_time}}</div>
                 </div>
                 <div class="row mt-2">
@@ -97,7 +97,25 @@
                     </div>
                 </div>
             </form>
+            {% if info.period_attention_chart != '' %}
             <div class="row mt-2">
+                <div class="col-md-3 text-md-right"><strong>Period Average Attention</strong></div>
+                <div class="col-md-auto">{{info.period_average_attention}}</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3 text-md-right"><strong>Period Cumulative Attention</strong></div>
+                <div class="col-md-auto">{{info.period_cumulative_attention}}</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3 text-md-right"><strong>Period Number of Recognized People</strong></div>
+                <div class="col-md-auto">{{info.period_recognitions}}</div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3 text-md-right"><strong>Period Number of Captured Frames</strong></div>
+                <div class="col-md-auto">{{info.period_frames}}</div>
+            </div>
+            {% endif %}
+            <!--<div class="row mt-2">
                 <div class="col-md-3 text-md-right"></div>
                 {% if info.period_attention_chart != '' %}
                 <div class="col-md-auto chart-overflow">
@@ -112,7 +130,7 @@
                     <img src="{{info.period_emotions_chart}}">
                 </div>
                 {% endif %}
-            </div>
+            </div>-->
         </div>
     </div>
 </main>
